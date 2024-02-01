@@ -1,9 +1,11 @@
-<picture>
-    <source srcset="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_Solid_White.svg" media="(prefers-color-scheme: dark)">
-    <img src="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_RGB.svg" alt="Leptos Logo">
-</picture>
+# Tulip
 
-# Leptos Starter Template
+Tulip (Transport Unification Live Infrastructure Portal) allows users to browse a human readable version of Catenary data and access API endpoints.
+
+It also allows administrators on the Catenary team to debug and make changes to Catenary's infrastructure and data in real-time, without having to access the Kubernetes / Distributed system database directly. 
+This is a powerful tool to manage and diagnose the vast complexity that exists on Catenary Transit Initiatives cloud system.
+
+### Original Leptos Template
 
 This is a template for use with the [Leptos](https://github.com/leptos-rs/leptos) web framework and the [cargo-leptos](https://github.com/akesson/cargo-leptos) tool.
 
