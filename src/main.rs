@@ -11,6 +11,8 @@ async fn main() -> std::io::Result<()> {
     // Setting this to None means we'll be using cargo-leptos and its env vars.
     let conf = get_configuration(None).await.unwrap();
 
+    println!("Configuration {:?}", conf);
+
     let addr = conf.leptos_options.site_addr;
 
     // Generate the list of routes in your Leptos App

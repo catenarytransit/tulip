@@ -1,5 +1,5 @@
 [package]
-name = "buttercup"
+name = "tulip"
 version = "0.1.0"
 edition = "2021"
 
@@ -19,6 +19,8 @@ leptos_router = { version = "0.6", features = ["nightly"] }
 wasm-bindgen = "=0.2"
 log = "0.4.20"
 console_log = "1.0.0"
+reqwasm = "0.5.0"
+serde = "1.0.196"
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -41,6 +43,7 @@ codegen-units = 1
 panic = "abort"
 
 [package.metadata.leptos]
+not_found_path = "/404.html"
 # The name used by wasm-bindgen/cargo-leptos for the JS/WASM bundle. Defaults to the crate name   
 output-name = "leptos_start"
 # The site root folder is where cargo-leptos generate all output. WARNING: all content of this folder will be erased on a rebuild. Use it in your server setup.
