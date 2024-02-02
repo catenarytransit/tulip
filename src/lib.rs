@@ -1,19 +1,27 @@
-pub mod app;
-use cfg_if::cfg_if;
+mod app;
 
-cfg_if! {
-if #[cfg(feature = "hydrate")] {
+#[cfg(feature = "hydrate")]
+#[wasm_bindgen::prelude::wasm_bindgen]
+pub fn hydrate() {
+    use crate::app::App;
+    use leptos::{logging, mount_to_body};
+    _ = console_log::init_with_level(log::Level::Debug);
+    console_error_panic_hook::set_once();
 
-  use wasm_bindgen::prelude::wasm_bindgen;
+    logging::log!("hydrate mode - hydrating");
 
-    #[wasm_bindgen]
-    pub fn hydrate() {
-      use app::*;
-      use leptos::*;
-
-      console_error_panic_hook::set_once();
-
-      leptos::mount_to_body(App);
-    }
+    mount_to_body(App);
 }
+
+#[cfg(feature = "csr")]
+#[wasm_bindgen::prelude::wasm_bindgen(start)]
+pub fn main() {
+    use crate::app::App;
+    use leptos::{logging, mount_to_body};
+    _ = console_log::init_with_level(log::Level::Debug);
+    console_error_panic_hook::set_once();
+
+    logging::log!("csr mode - mounting to body");
+
+    mount_to_body(App);
 }

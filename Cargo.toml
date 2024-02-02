@@ -11,12 +11,14 @@ actix-files = { version = "0.6", optional = true }
 actix-web = { version = "4", optional = true, features = ["macros"] }
 console_error_panic_hook = "0.1"
 cfg-if = "1"
-http = { version = "0.2", optional = true }
-leptos = { version = "0.5", features = ["nightly"] }
-leptos_meta = { version = "0.5", features = ["nightly"] }
-leptos_actix = { version = "0.5", optional = true }
-leptos_router = { version = "0.5", features = ["nightly"] }
-wasm-bindgen = "=0.2.89"
+http = { version = "1", optional = true }
+leptos = { version = "0.6", features = ["nightly"] }
+leptos_meta = { version = "0.6", features = ["nightly"] }
+leptos_actix = { version = "0.6", optional = true }
+leptos_router = { version = "0.6", features = ["nightly"] }
+wasm-bindgen = "=0.2"
+log = "0.4.20"
+console_log = "1.0.0"
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -92,3 +94,12 @@ lib-default-features = false
 #
 # Optional. Defaults to "release".
 lib-profile-release = "wasm-release"
+
+# Optional, Activates the tailwind build
+tailwind-input-file = "style/tailwind.css"
+
+# The tailwind config file.
+#
+# Optional, defaults to "tailwind.config.js" which if is not present
+# is generated for you
+tailwind-config-file = "tailwind.config.js"
