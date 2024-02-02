@@ -21,6 +21,14 @@ log = "0.4.20"
 console_log = "1.0.0"
 reqwasm = "0.5.0"
 serde = "1.0.196"
+web-sys = {version = "0.3.67", features = ["Request"]}
+wasm-bindgen-futures = "0.4.40"
+reqwest-wasm = "0.11.16"
+serde_json = "1.0.113"
+wasm = "0.0.0"
+wasm-timer = "0.2.5"
+chrono = {version = "0.4", features = ["serde", "wasmbind"]}
+regex = "1.10.3"
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -106,3 +114,4 @@ tailwind-input-file = "style/tailwind.css"
 # Optional, defaults to "tailwind.config.js" which if is not present
 # is generated for you
 tailwind-config-file = "tailwind.config.js"
+
