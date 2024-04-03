@@ -29,6 +29,7 @@ wasm = "0.0.0"
 wasm-timer = "0.2.5"
 chrono = {version = "0.4", features = ["serde", "wasmbind"]}
 regex = "1.10.3"
+firebase-js-rs = "0.1.1"
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
