@@ -21,8 +21,7 @@ pub fn App() -> impl IntoView {
         <Router>
             <Routes>
                 <Route path="/" view=move || view! { <Home/> }/>
-                <Route path="/gtfsingesterrors" view=move || view! { <GtfsIngestErrors/> }/>
-                <Route path="/kactustimes" view=move || view! { <KactusTimes/> }/>
+               
                 <Route path="/leptosexample" view=move || view! { <LeptosExample/> }/>
                 <Route path="/404.html" view=move || view! { <NotFound/> }/>
             </Routes>
@@ -54,55 +53,7 @@ fn Home() -> impl IntoView {
     view! {
         <Nav/>
         <main>
-            <a href="gtfsingesterrors">
-                <p>"GTFS Ingest Errors"</p>
-            </a>
         </main>
-    }
-}
-
-#[component]
-fn KactusTimes() -> impl IntoView {
-    view! {
-        <Nav/>
-        <main></main>
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-struct GtfsIngestErrorRow {
-    onestop_feed_id: String,
-    error: String,
-}
-
-type FetchErrorsOutput = Result<Vec<GtfsIngestErrorRow>, Box<dyn std::error::Error>>;
-async fn fetch_gtfs_ingest_errors() -> FetchErrorsOutput {
-    //let res = reqwasm::http::Request::get("https://backend.catenarymaps.org/gtfsingesterrors")
-    //.send().await;
-
-    log!("Fetching errors list from backend");
-
-    let res = reqwest_wasm::get("https://backend.catenarymaps.org/gtfsingesterrors").await;
-
-    match res {
-        Ok(res) => {
-            let text = res.text().await.unwrap();
-            log!("{}", text);
-
-            let output = serde_json::from_str::<Vec<GtfsIngestErrorRow>>(text.as_str()).unwrap();
-
-            for row in &output {
-                log!("{}", row.error);
-            }
-
-             let output = output.into_iter().map(|x| GtfsIngestErrorRow {
-                onestop_feed_id: x.onestop_feed_id,
-                error: x.error.replace("\\n","\n")
-            }).collect::<Vec<GtfsIngestErrorRow>>();
-
-            Ok(output)
-        }
-        Err(err) => Err(Box::new(err)),
     }
 }
 
@@ -112,83 +63,7 @@ fn time_format_now() -> String {
     format!("{}", system_time.format("%A %+"))
 }
 
-#[component]
-fn GtfsIngestErrors() -> impl IntoView {
-    let (request_time, set_request_time) = create_signal::<DateTime<Local>>(Local::now());
 
-    let error_list: Resource<DateTime<Local>, Option<Vec<GtfsIngestErrorRow>>> = create_resource(
-        move || request_time.get(),
-        |value| async move {
-            let data_from_backend = fetch_gtfs_ingest_errors().await;
-
-            match data_from_backend {
-                Ok(data_from_backend) => Some(data_from_backend),
-                _ => None,
-            }
-        },
-    );
-
-    create_effect(move |_| {
-        // immediately prints "Value: 0" and subscribes to `a`
-        set_request_time(Local::now());
-      });
-
-    view! {
-        <Nav/>
-        <main class="mx-3">
-            <h1 class="font-semibold text-2xl">"GTFS Ingest Errors"</h1>
-            <button
-                class="px-2 py-1 border border-black"
-                on:click=move |_| set_request_time(Local::now())
-            >
-                "Reload"
-            </button>
-
-            <table>
-                <thead>
-                    <tr class="font-semibold">
-                        <td>"onestop_feed_id"</td>
-                        <td>"error"</td>
-                    </tr>
-                </thead>
-                <Suspense fallback=move || {
-                    view! { <p></p> }
-                }>
-
-                    {move || match error_list.get() {
-                        Some(data) => {
-                            match data {
-                                Some(inner_data) => {
-                                    view! {
-                                        <For
-                                            each=move || inner_data.clone()
-                                            key=|row| row.clone().onestop_feed_id
-                                            children=move |row: GtfsIngestErrorRow| {
-                                                view! {
-                                                    <tr>
-                                                        <td class="font-mono border border-slate-500">
-                                                            {row.onestop_feed_id}
-                                                        </td>
-                                                        <td class="font-mono border border-slate-500 whitespace-pre-wrap">
-                                                            {row.error}
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            }
-                                        />
-                                    }
-                                }
-                                None => view! { <p>"Nothing found"</p> }.into_view(),
-                            }
-                        }
-                        None => view! { () }.into_view(),
-                    }}
-
-                </Suspense>
-            </table>
-        </main>
-    }
-}
 
 #[component]
 fn NotFound() -> impl IntoView {
