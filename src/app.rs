@@ -6,13 +6,13 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
+use std::collections::HashMap;
+use std::rc::Rc;
+use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
-use std::sync::Arc;
-use std::rc::Rc;
-use std::collections::HashMap;
-use std::collections::BTreeMap;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -26,7 +26,7 @@ pub fn App() -> impl IntoView {
             <Routes>
                 <Route path="/" view=move || view! { <Home/> }/>
                 <Route path="/realtimekeys" view=move || view! { <RealtimeKeys
-                   
+
                     /> }/>
                 <Route path="/leptosexample" view=move || view! { <LeptosExample
                     /> }/>
@@ -90,7 +90,6 @@ pub struct PasswordInfo {
     pub creator_email: String,
 }
 
-
 #[derive(Serialize, Clone, Deserialize, Debug)]
 pub struct EachPasswordRow {
     pub passwords: Option<PasswordFormat>,
@@ -103,7 +102,10 @@ pub struct KeyResponse {
 }
 
 #[server]
-async fn load_realtime_keys(master_email: String, master_password: String) -> Result<Option<KeyResponse>, ServerFnError> {
+async fn load_realtime_keys(
+    master_email: String,
+    master_password: String,
+) -> Result<Option<KeyResponse>, ServerFnError> {
     let client = reqwest::Client::new();
 
     let response = client
@@ -118,21 +120,20 @@ async fn load_realtime_keys(master_email: String, master_password: String) -> Re
         reqwest::StatusCode::OK => {
             let response_text = response.text().await?;
             println!("Recieved response back from birch");
-        
+
             let key_response: KeyResponse = serde_json::from_str(&response_text)?;
 
             Ok(Some(key_response))
-        },
+        }
         reqwest::StatusCode::UNAUTHORIZED => {
             println!("Unauthorized");
             Ok(None)
-        },
+        }
         _ => {
             println!("Error, {}", response.status());
             Err(ServerFnError::new("Data did not load correctly"))
         }
     }
-
 }
 
 #[component]
@@ -141,7 +142,8 @@ fn RealtimeKeys() -> impl IntoView {
     let (master_password, set_master_password) = create_signal(String::from(""));
     let (master_creds, set_master_creds) = create_signal((String::from(""), String::from("")));
 
-    let (original_keys, set_original_keys) = create_signal::<BTreeMap<String, EachPasswordRow>>(BTreeMap::new());
+    let (original_keys, set_original_keys) =
+        create_signal::<BTreeMap<String, EachPasswordRow>>(BTreeMap::new());
 
     let (authorised, set_authorised) = create_signal(false);
 
@@ -151,10 +153,9 @@ fn RealtimeKeys() -> impl IntoView {
         move || (master_email.get(), master_password.get(), count.get()),
         |(master_email, master_password, _)| async move {
             load_realtime_keys(master_email.clone(), master_password.clone()).await
-        }
+        },
     );
 
-    
     create_effect(move |_| {
         async_data_load.and_then(|data| {
             if let Some(data) = data {
@@ -206,11 +207,11 @@ fn RealtimeKeys() -> impl IntoView {
 
             <br/>
 
-            
+
                 <div>
                 <Transition fallback=move || view! {<p>"Loading..."</p> }>
             <ErrorBoundary fallback=|errors| view!{<p>"There was an error"</p>}>
-            
+
                 <div>
                     <h2>"Realtime Keys"</h2>
                     {
@@ -236,15 +237,14 @@ fn RealtimeKeys() -> impl IntoView {
                         }).collect_view()}
                     </ul>
                 </div>
-            
+
             </ErrorBoundary>
             </Transition>
                 </div>
-            
+
         </main>
     }
 }
-
 
 fn time_format_now() -> String {
     let system_time = Local::now();
