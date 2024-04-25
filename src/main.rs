@@ -1,12 +1,12 @@
+
+
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    mod app;
-
-    use crate::app::*;
     use actix_files::Files;
     use actix_web::*;
     use leptos::*;
+    use tulip::app::*;
         use leptos_actix::{generate_route_list, LeptosRoutes};
             // Setting this to None means we'll be using cargo-leptos and its env vars.
             let conf = get_configuration(None).await.unwrap();
@@ -26,7 +26,7 @@ async fn main() -> std::io::Result<()> {
                     .leptos_routes(
                         leptos_options.to_owned(),
                         routes.to_owned(),
-                        || view! { <App/> },
+                        App,
                     )
                     .service(Files::new("/", site_root))
                     .wrap(middleware::Compress::default())
