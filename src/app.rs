@@ -173,6 +173,7 @@ async fn submit_data(
         ))
         .header("email", master_email)
         .header("password", master_password)
+        .header("Content-Type","application/json")
         .body(serde_json::to_string(&data_to_send)?)
         .send()
         .await?;
