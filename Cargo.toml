@@ -38,7 +38,7 @@ log = "0.4.21"
 firebase-js-rs = "0.1.1"
 serde-wasm-bindgen = "0.6.5"
 argon2 = "0.5.3"
-
+ron = "0.8.1"
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -58,6 +58,17 @@ ssr = [
   "leptos_router/ssr",
     "leptos_i18n/actix",
 ]
+
+[package.metadata.cargo-all-features]
+denylist = [
+	"axum",
+	"tower",
+	"tower-http",
+	"tokio",
+	"sqlx",
+	"leptos_axum",
+]
+skip_feature_sets = [["csr", "ssr"], ["csr", "hydrate"], ["ssr", "hydrate"]]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]

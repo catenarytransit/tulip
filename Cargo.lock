@@ -413,6 +413,9 @@ name = "bitflags"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf4b9d6a944f767f8e5e0db018570623c85f3d925ac718db4e06d0187adb21c1"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "blake2"
@@ -2812,6 +2815,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "ron"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b91f7eff05f748767f183df4320a63d6936e9c6107d97c9e6bdd9784f4289c94"
+dependencies = [
+ "base64 0.21.7",
+ "bitflags 2.5.0",
+ "serde",
+ "serde_derive",
+]
+
+[[package]]
 name = "rstml"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3586,6 +3601,7 @@ dependencies = [
  "qstring",
  "rand 0.8.5",
  "reqwest",
+ "ron",
  "serde",
  "serde-wasm-bindgen 0.6.5",
  "serde_json",
