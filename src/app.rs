@@ -185,10 +185,10 @@ async fn submit_data(
 
             match text {
                 Ok(text) => {
-                    println!("{}", text);
+                    println!("recieved strange answer from birch on setrealtimekey, {} text {}", response.status(), text);
                 },
                 Err(err) => {
-                    println!("{}", err);
+                    println!("error on birch setrealtimekey {} err {}", response.status(), err);
                 }
             }
             Err(ServerFnError::new("Data did not submit correctly"))},
