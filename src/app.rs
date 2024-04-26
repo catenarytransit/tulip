@@ -106,7 +106,7 @@ pub struct EachPasswordRow {
 pub struct EachPasswordRowInput {
     pub passwords: String,
     pub fetch_interval_ms: String,
-    pub originals: EachPasswordRow
+    pub originals: EachPasswordRow,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -155,7 +155,7 @@ async fn submit_data(
     master_password: String,
     feed_id: String,
     password: String,
-    interval: String
+    interval: String,
 ) -> Result<bool, ServerFnError> {
     //post json EachPasswordRow to /setrealtimekey/{feed_id}/
 
@@ -167,7 +167,10 @@ async fn submit_data(
     };
 
     let response = client
-        .post(format!("https://birch.catenarymaps.org/setrealtimekey/{}/", feed_id))
+        .post(format!(
+            "https://birch.catenarymaps.org/setrealtimekey/{}/",
+            feed_id
+        ))
         .header("email", master_email)
         .header("password", master_password)
         .body(serde_json::to_string(&data_to_send)?)
@@ -175,17 +178,10 @@ async fn submit_data(
         .await?;
 
     match response.status() {
-        reqwest::StatusCode::OK => {
-            Ok(true)
-        }
-        reqwest::StatusCode::UNAUTHORIZED => {
-            Ok(false)
-        }
-        _ => {
-            Err(ServerFnError::new("Data did not load correctly"))
-        }
+        reqwest::StatusCode::OK => Ok(true),
+        reqwest::StatusCode::UNAUTHORIZED => Ok(false),
+        _ => Err(ServerFnError::new("Data did not load correctly")),
     }
-
 }
 
 #[component]
@@ -198,10 +194,9 @@ fn RealtimeKeys() -> impl IntoView {
     let (form_password, set_form_password) = create_signal(String::from(""));
     let (form_interval_ms, set_form_interval_ms) = create_signal(String::from(""));
 
-   // let new_keys = create_rw_signal::<HashMap<String, EachPasswordRowInput>>(HashMap::new());
+    // let new_keys = create_rw_signal::<HashMap<String, EachPasswordRowInput>>(HashMap::new());
 
-    let original_keys =
-        create_rw_signal::<HashMap<String, EachPasswordRow>>(HashMap::new());
+    let original_keys = create_rw_signal::<HashMap<String, EachPasswordRow>>(HashMap::new());
 
     let (authorised, set_authorised) = create_signal(false);
 
@@ -219,10 +214,25 @@ fn RealtimeKeys() -> impl IntoView {
     let interval_ms_node_ref: NodeRef<html::Input> = create_node_ref();
 
     let push_data = create_resource(
-        move || (master_email.get(), master_password.get(), form_feed_id.get(), form_password.get(), form_interval_ms.get()),
+        move || {
+            (
+                master_email.get(),
+                master_password.get(),
+                form_feed_id.get(),
+                form_password.get(),
+                form_interval_ms.get(),
+            )
+        },
         |(master_email, master_password, form_feed_id, form_password, form_interval_ms)| async move {
             if form_feed_id.len() > 0 && form_password.len() > 0 && form_interval_ms.len() > 0 {
-                submit_data(master_email.clone(), master_password.clone(), form_feed_id.clone(), form_password.clone(), form_interval_ms.clone()).await
+                submit_data(
+                    master_email.clone(),
+                    master_password.clone(),
+                    form_feed_id.clone(),
+                    form_password.clone(),
+                    form_interval_ms.clone(),
+                )
+                .await
             } else {
                 Ok(false)
             }
@@ -235,7 +245,7 @@ fn RealtimeKeys() -> impl IntoView {
             if let Some(data) = data {
                 original_keys.update(|x| *x = data.passwords.clone());
                 set_authorised(true);
-               /*  new_keys.update(|x| *x = data.passwords.clone().into_iter().map(
+                /*  new_keys.update(|x| *x = data.passwords.clone().into_iter().map(
                     |(key, value)| {
                         (
                             key.clone(),
@@ -328,8 +338,8 @@ fn RealtimeKeys() -> impl IntoView {
                     <h2 class="text-xl font-semibold">"Realtime Keys"</h2>
 
                     <ul>
-                     { 
-                        move || 
+                     {
+                        move ||
                             original_keys.with(|keys| keys.iter().map(|(key, value)| {
                                 view! {
                                     <li>
@@ -338,14 +348,14 @@ fn RealtimeKeys() -> impl IntoView {
                                         <p class="font-semibold">"Passwords:"</p>
                                         <p class="bg-gray-100 font-mono">{format!("{}", ron::ser::to_string_pretty(&value.passwords,
                                             ron::ser::PrettyConfig::default()).unwrap())}</p>
-                                        
+
                                         <p class="font-semibold">"Fetch Interval:"</p>
                                         <p>{format!("{:?}", value.fetch_interval_ms)}</p>
                                     </li>
                                 }
                             }).collect_view())
                      }
-                        
+
                     </ul>
                 </div>
 
@@ -355,7 +365,7 @@ fn RealtimeKeys() -> impl IntoView {
 
                 <div class="flex flex-row gap-x-2">
                      <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
-                     
+
                     on:click=move |_| {
                         set_form_feed_id(String::from(""));
                         set_form_interval_ms(String::from(""));
@@ -366,8 +376,8 @@ fn RealtimeKeys() -> impl IntoView {
 
                         <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
                         on:click=move |_| {
-                            set_form_password(format!("{}", 
-                        
+                            set_form_password(format!("{}",
+
                                 ron::ser::to_string_pretty(&Some(PasswordFormat::default()),
                                     ron::ser::PrettyConfig::default()).unwrap()
                         ));
@@ -402,7 +412,7 @@ fn RealtimeKeys() -> impl IntoView {
                         "Import using feed id"
                     </button>
                 </div>
-                
+
                 <p>"feed id"</p>
 
                 <input
@@ -442,7 +452,7 @@ fn RealtimeKeys() -> impl IntoView {
                 node_ref=interval_ms_node_ref
             />
 
-            
+
              {
                 move || match ron::from_str::<Option<u32>>(form_interval_ms.get().as_str()) {
                     Ok(_) => view! {
@@ -503,14 +513,14 @@ fn RealtimeKeys() -> impl IntoView {
             }
 
             <button
-                
+
                 class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
                 disabled=move || !authorised.get()
             on:click=move |e| {
                push_data.dispatch(0);
             }
                 >"Submit"</button>
-                
+
                 </div>
 
         </main>
@@ -560,16 +570,20 @@ fn give_wmata_format() -> Option<PasswordFormat> {
 fn give_sfbay_format() -> Option<PasswordFormat> {
     Some(PasswordFormat {
         key_formats: vec![KeyFormat::UrlQuery("api_key".to_string())],
-        passwords: vec![PasswordInfo {
-            password: vec!["f8f683cc177053581ef9d425071eb6d1".to_string()],
-            creator_email: String::from("kyler@catenarymaps.org"),
-        },
-        PasswordInfo {
-            password: vec!["e6c335d9cab3bd41ac51bc6235ce966b".to_string()],
-            creator_email: String::from("sam@catenarymaps.org"),
-        }],
+        passwords: vec![
+            PasswordInfo {
+                password: vec!["f8f683cc177053581ef9d425071eb6d1".to_string()],
+                creator_email: String::from("kyler@catenarymaps.org"),
+            },
+            PasswordInfo {
+                password: vec!["e6c335d9cab3bd41ac51bc6235ce966b".to_string()],
+                creator_email: String::from("sam@catenarymaps.org"),
+            },
+        ],
         override_schedule_url: None,
-        override_realtime_vehicle_positions: Some(String::from("http://api.511.org/transit/vehiclepositions")),
+        override_realtime_vehicle_positions: Some(String::from(
+            "http://api.511.org/transit/vehiclepositions",
+        )),
         override_realtime_trip_updates: None,
         override_alerts: None,
     })
