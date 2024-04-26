@@ -213,32 +213,6 @@ fn RealtimeKeys() -> impl IntoView {
     let password_node_ref: NodeRef<html::Textarea> = create_node_ref();
     let interval_ms_node_ref: NodeRef<html::Input> = create_node_ref();
 
-    let push_data = create_resource(
-        move || {
-            (
-                master_email.get(),
-                master_password.get(),
-                form_feed_id.get(),
-                form_password.get(),
-                form_interval_ms.get(),
-            )
-        },
-        |(master_email, master_password, form_feed_id, form_password, form_interval_ms)| async move {
-            if form_feed_id.len() > 0 && form_password.len() > 0 && form_interval_ms.len() > 0 {
-                submit_data(
-                    master_email.clone(),
-                    master_password.clone(),
-                    form_feed_id.clone(),
-                    form_password.clone(),
-                    form_interval_ms.clone(),
-                )
-                .await
-            } else {
-                Ok(false)
-            }
-        },
-    );
-
     create_effect(move |_| {
         async_data_load.and_then(|data| {
             leptos::logging::log!("{:?}", data);
@@ -517,7 +491,14 @@ fn RealtimeKeys() -> impl IntoView {
                 class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
                 disabled=move || !authorised.get()
             on:click=move |e| {
-               push_data.dispatch(0);
+              let master_creds = master_creds.get();
+              let (form_feed_id, form_password, form_interval_ms) = (form_feed_id.get(),
+              form_password.get(),
+              form_interval_ms.get());
+
+              spawn_local(async move {
+                submit_data(master_creds.0, master_creds.1, form_feed_id, form_password, form_interval_ms).await;
+              });
             }
                 >"Submit"</button>
 
