@@ -177,7 +177,9 @@ async fn submit_data(
         .send()
         .await?;
 
-    match response.status() {
+        let status = response.status();
+
+    match status {
         reqwest::StatusCode::OK => Ok(true),
         reqwest::StatusCode::UNAUTHORIZED => Ok(false),
         _ => {
@@ -185,10 +187,10 @@ async fn submit_data(
 
             match text {
                 Ok(text) => {
-                    println!("recieved strange answer from birch on setrealtimekey, {} text {}", response.status(), text);
+                    println!("recieved strange answer from birch on setrealtimekey, {} text {}", status, text);
                 },
                 Err(err) => {
-                    println!("error on birch setrealtimekey {} err {}", response.status(), err);
+                    println!("error on birch setrealtimekey {} err {}", status, err);
                 }
             }
             Err(ServerFnError::new("Data did not submit correctly"))},
