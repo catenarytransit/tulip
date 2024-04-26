@@ -162,8 +162,8 @@ async fn submit_data(
     let client = reqwest::Client::new();
 
     let data_to_send = EachPasswordRow {
-        passwords: Some(ron::from_str(&password)?),
-        fetch_interval_ms: Some(ron::from_str(&interval)?),
+        passwords: ron::from_str(&password)?,
+        fetch_interval_ms: ron::from_str(&interval)?,
     };
 
     let response = client
