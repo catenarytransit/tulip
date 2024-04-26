@@ -180,7 +180,18 @@ async fn submit_data(
     match response.status() {
         reqwest::StatusCode::OK => Ok(true),
         reqwest::StatusCode::UNAUTHORIZED => Ok(false),
-        _ => Err(ServerFnError::new("Data did not load correctly")),
+        _ => {
+            let text = response.text().await;
+
+            match text {
+                Ok(text) => {
+                    println!("{}", text);
+                },
+                Err(err) => {
+                    println!("{}", err);
+                }
+            }
+            Err(ServerFnError::new("Data did not submit correctly"))},
     }
 }
 
