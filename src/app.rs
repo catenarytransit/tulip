@@ -173,7 +173,7 @@ async fn submit_data(
         ))
         .header("email", master_email)
         .header("password", master_password)
-        .body(ron::to_str(&data_to_send)?)
+        .body(ron::ser::to_string(&data_to_send)?)
         .send()
         .await?;
 
