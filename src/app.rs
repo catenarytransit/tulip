@@ -521,6 +521,7 @@ fn RealtimeKeys() -> impl IntoView {
 
               spawn_local(async move {
                 submit_data(master_creds.0, master_creds.1, form_feed_id, form_password, form_interval_ms).await;
+                async_data_load.refetch();
               });
             }
                 >"Submit"</button>
