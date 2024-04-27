@@ -155,7 +155,7 @@ async fn submit_data(
     master_password: String,
     feed_id: String,
     password: String,
-    interval: String,
+    interval: String
 ) -> Result<bool, ServerFnError> {
     //post json EachPasswordRow to /setrealtimekey/{feed_id}/
 
@@ -173,8 +173,7 @@ async fn submit_data(
         ))
         .header("email", master_email)
         .header("password", master_password)
-        .header("Content-Type","application/json")
-        .body(serde_json::to_string(&data_to_send)?)
+        .body(ron::to_str(&data_to_send)?)
         .send()
         .await?;
 
