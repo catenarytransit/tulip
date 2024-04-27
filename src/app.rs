@@ -327,8 +327,7 @@ fn RealtimeKeys() -> impl IntoView {
                     //reload button
                     <button
                     on:click=move |e| {
-                        let async_data_load_ref = async_data_load.with();
-                        async_data_load_ref.refresh();
+                         async_data_load.with(|x| x.refresh());
                     }
                     class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
                     >
