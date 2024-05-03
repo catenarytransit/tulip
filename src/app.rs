@@ -89,14 +89,14 @@ fn Help() -> impl IntoView {
             <h1 class="text-xl font-bold text-tulip mb-2">"Realtime Key Manager"</h1>
             <p> "Keys are defined as "<code class="mx-1">"Option<PasswordFormat>"</code>" as defined in this structure here:"</p>
             <div id="example-password h-[400px]"></div>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap"><code>{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
             <p class="font-bold">"Every password entry is required to have the same length as key_format. Uploads will be blocked otherwise."</p>
             <p>"The fetch interval is the number of milliseconds between fetches of the realtime data. Putting None will default the value to what Alpenrose has."</p>
             <br />
             <p>"Here's an imaginary entry for data from the Washington Metropolitan Area Transit Authority (WMATA):"</p>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap"><code>{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
             <p>"Here's an imaginary entry for the San Francisco Bay Area data feed (Bay Area 511), but let's pretend we need to set the vehicle position url manually:"</p>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap"><code>{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
         </main>
     }
 }
@@ -326,18 +326,16 @@ fn RealtimeKeys() -> impl IntoView {
                         "Reload"
                     </button>
                      
-                    <ul class="grid grid-cols-4	gap-4">
+                    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {
                         move ||
                             original_keys.with(|keys| keys.iter().map(|(key, value)| {
                                 view! {
                                     <li>
-                                    <h3 class="text-lg font-semibold">{key.clone()}</h3>
-                                        <p class="font-bold">"Current values"</p>
+                                        <h3 class="text-lg font-semibold">{key.clone()}</h3>
                                         <p class="font-semibold">"Passwords:"</p>
-                                        <p class="bg-gray-100 font-mono">{format!("{}", ron::ser::to_string_pretty(&value.passwords,
-                                            ron::ser::PrettyConfig::default()).unwrap())}</p>
-
+                                        <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
+                                            ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
                                         <p class="font-semibold">"Fetch Interval:"</p>
                                         <p>{format!("{:?}", value.fetch_interval_ms)}</p>
                                     </li>
