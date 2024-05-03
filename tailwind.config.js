@@ -5,7 +5,15 @@ module.exports = {
     },
     darkMode: "class",
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                tulip: '#E470AB',
+                darksky: '#0A233F',
+                darkskyvariant: '#06121F',
+                seashore: '#42A7C5',
+                gray: '#EDEDED'
+            }
+        },
     },
     plugins: [],
 }
