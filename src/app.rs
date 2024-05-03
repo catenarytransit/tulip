@@ -89,14 +89,14 @@ fn Help() -> impl IntoView {
             <h1 class="text-xl font-bold text-tulip mb-2">"Realtime Key Manager"</h1>
             <p> "Keys are defined as "<code class="mx-1">"Option<PasswordFormat>"</code>" as defined in this structure here:"</p>
             <div id="example-password h-[400px]"></div>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky"><code>{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap"><code>{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
             <p class="font-bold">"Every password entry is required to have the same length as key_format. Uploads will be blocked otherwise."</p>
             <p>"The fetch interval is the number of milliseconds between fetches of the realtime data. Putting None will default the value to what Alpenrose has."</p>
             <br />
             <p>"Here's an imaginary entry for data from the Washington Metropolitan Area Transit Authority (WMATA):"</p>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky"><code>{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap"><code>{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
             <p>"Here's an imaginary entry for the San Francisco Bay Area data feed (Bay Area 511), but let's pretend we need to set the vehicle position url manually:"</p>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky"><code>{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap"><code>{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
         </main>
     }
 }
@@ -281,27 +281,23 @@ fn RealtimeKeys() -> impl IntoView {
         <Nav/>
         <main class="p-8">
             <h1 class="text-2xl font-bold text-tulip">"Realtime Key Manager"</h1>
-
             <p>"Please confirm your Tulip login credentials, as key information is sensitive and confidential."</p>
-
-            <p>"Email"</p>
 
             <input
                 type="email"
+                placeholder="Email"
                 prop:value=move || master_email.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold mr-4"
                 on:input=move |event| {
                     set_master_email(event_target_value(&event));
                     set_master_creds((event_target_value(&event), master_password.get()));
                 }
             />
-
-            <p>"Password"</p>
-
             <input
                 type="password"
+                placeholder="Password"
                 prop:value=move || master_password.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 on:input=move |event| {
                     set_master_password(event_target_value(&event));
                     set_master_creds((master_email.get(), event_target_value(&event)));
@@ -309,9 +305,7 @@ fn RealtimeKeys() -> impl IntoView {
             />
 
             <br/>
-
-            //load button
-            <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+            <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
             on:input=move |event| set_count.update(|count| *count += 1)
             >"Load"</button>
 
@@ -327,12 +321,12 @@ fn RealtimeKeys() -> impl IntoView {
                     on:click=move |e| {
                          async_data_load.refetch();
                     }
-                    class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                    class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                     >
                         "Reload"
                     </button>
                      
-                    <ul>
+                    <ul class="grid grid-cols-4	gap-4">
                      {
                         move ||
                             original_keys.with(|keys| keys.iter().map(|(key, value)| {
@@ -358,7 +352,7 @@ fn RealtimeKeys() -> impl IntoView {
                 </h2></div>
 
                 <div class="flex flex-row gap-x-2">
-                     <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                     <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
 
                     on:click=move |_| {
                         set_form_feed_id(String::from(""));
@@ -368,7 +362,7 @@ fn RealtimeKeys() -> impl IntoView {
                     disabled=move || !authorised.get()
                      >"Clear all fields"</button>
 
-                        <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                        <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                         on:click=move |_| {
                             set_form_password(format!("{}",
 
@@ -381,7 +375,7 @@ fn RealtimeKeys() -> impl IntoView {
                         "Fill with default password format"
                     </button>
 
-                    <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                    <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                         on:click=move |_| {
                             match original_keys.get().get(form_feed_id.get().as_str()) {
                                 Some(original_data) => {
@@ -413,7 +407,7 @@ fn RealtimeKeys() -> impl IntoView {
                 type="text"
                 prop:value=move || form_feed_id.get()
                 disabled=move || !authorised.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 on:input=move |event| {
                     set_form_feed_id(event_target_value(&event));
                 }
@@ -438,7 +432,7 @@ fn RealtimeKeys() -> impl IntoView {
             <input
                 type="text"
                 prop:value=move || form_interval_ms.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
                 on:input=move |event| {
                     set_form_interval_ms(event_target_value(&event));
@@ -508,7 +502,7 @@ fn RealtimeKeys() -> impl IntoView {
 
             <button
 
-                class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
             on:click=move |e| {
               let master_creds = master_creds.get();
