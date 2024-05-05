@@ -155,15 +155,15 @@ async fn submit_data(
     master_password: String,
     feed_id: String,
     password: String,
-    interval: String,
+    interval: String
 ) -> Result<bool, ServerFnError> {
     //post json EachPasswordRow to /setrealtimekey/{feed_id}/
 
     let client = reqwest::Client::new();
 
     let data_to_send = EachPasswordRow {
-        passwords: Some(ron::from_str(&password)?),
-        fetch_interval_ms: Some(ron::from_str(&interval)?),
+        passwords: ron::from_str(&password)?,
+        fetch_interval_ms: ron::from_str(&interval)?,
     };
 
     let response = client
@@ -173,14 +173,27 @@ async fn submit_data(
         ))
         .header("email", master_email)
         .header("password", master_password)
-        .body(serde_json::to_string(&data_to_send)?)
+        .body(ron::ser::to_string(&data_to_send)?)
         .send()
         .await?;
 
-    match response.status() {
+        let status = response.status();
+
+    match status {
         reqwest::StatusCode::OK => Ok(true),
         reqwest::StatusCode::UNAUTHORIZED => Ok(false),
-        _ => Err(ServerFnError::new("Data did not load correctly")),
+        _ => {
+            let text = response.text().await;
+
+            match text {
+                Ok(text) => {
+                    println!("recieved strange answer from birch on setrealtimekey, {} text {}", status, text);
+                },
+                Err(err) => {
+                    println!("error on birch setrealtimekey {} err {}", status, err);
+                }
+            }
+            Err(ServerFnError::new("Data did not submit correctly"))},
     }
 }
 
@@ -210,32 +223,6 @@ fn RealtimeKeys() -> impl IntoView {
     let feed_id_node_ref: NodeRef<html::Input> = create_node_ref();
     let password_node_ref: NodeRef<html::Textarea> = create_node_ref();
     let interval_ms_node_ref: NodeRef<html::Input> = create_node_ref();
-
-    let push_data = create_resource(
-        move || {
-            (
-                master_email.get(),
-                master_password.get(),
-                form_feed_id.get(),
-                form_password.get(),
-                form_interval_ms.get(),
-            )
-        },
-        |(master_email, master_password, form_feed_id, form_password, form_interval_ms)| async move {
-            if form_feed_id.len() > 0 && form_password.len() > 0 && form_interval_ms.len() > 0 {
-                submit_data(
-                    master_email.clone(),
-                    master_password.clone(),
-                    form_feed_id.clone(),
-                    form_password.clone(),
-                    form_interval_ms.clone(),
-                )
-                .await
-            } else {
-                Ok(false)
-            }
-        },
-    );
 
     create_effect(move |_| {
         async_data_load.and_then(|data| {
@@ -335,6 +322,16 @@ fn RealtimeKeys() -> impl IntoView {
                     <div>
                     <h2 class="text-xl font-semibold">"Realtime Keys"</h2>
 
+                    //reload button
+                    <button
+                    on:click=move |e| {
+                         async_data_load.refetch();
+                    }
+                    class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                    >
+                        "Reload"
+                    </button>
+                     
                     <ul>
                      {
                         move ||
@@ -515,7 +512,15 @@ fn RealtimeKeys() -> impl IntoView {
                 class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
                 disabled=move || !authorised.get()
             on:click=move |e| {
-               push_data.refetch();
+              let master_creds = master_creds.get();
+              let (form_feed_id, form_password, form_interval_ms) = (form_feed_id.get(),
+              form_password.get(),
+              form_interval_ms.get());
+
+              spawn_local(async move {
+                submit_data(master_creds.0, master_creds.1, form_feed_id, form_password, form_interval_ms).await;
+                async_data_load.refetch();
+              });
             }
                 >"Submit"</button>
 
