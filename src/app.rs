@@ -111,7 +111,7 @@ pub struct EachPasswordRowInput {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct KeyResponse {
-    pub passwords: HashMap<String, EachPasswordRow>,
+    pub passwords: BTreeMap<String, EachPasswordRow>,
 }
 
 #[server]
@@ -194,9 +194,7 @@ fn RealtimeKeys() -> impl IntoView {
     let (form_password, set_form_password) = create_signal(String::from(""));
     let (form_interval_ms, set_form_interval_ms) = create_signal(String::from(""));
 
-    // let new_keys = create_rw_signal::<HashMap<String, EachPasswordRowInput>>(HashMap::new());
-
-    let original_keys = create_rw_signal::<HashMap<String, EachPasswordRow>>(HashMap::new());
+    let original_keys = create_rw_signal::<BTreeMap<String, EachPasswordRow>>(BTreeMap::new());
 
     let (authorised, set_authorised) = create_signal(false);
 
@@ -517,7 +515,7 @@ fn RealtimeKeys() -> impl IntoView {
                 class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
                 disabled=move || !authorised.get()
             on:click=move |e| {
-               push_data.dispatch(0);
+               push_data.refetch();
             }
                 >"Submit"</button>
 
