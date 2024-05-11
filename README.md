@@ -2,6 +2,8 @@
 
 Tulip (Transport Unification Live Infrastructure Portal) allows users to browse a human readable version of Catenary data and access API endpoints.
 
+https://tulip.catenarymaps.org
+
 It also allows administrators on the Catenary team to debug and make changes to Catenary's infrastructure and data in real-time, without having to access the Kubernetes / Distributed system database directly. 
 This is a powerful tool to manage and diagnose the vast complexity that exists on Catenary Transit Initiatives cloud system.
 
