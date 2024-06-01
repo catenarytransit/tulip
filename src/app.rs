@@ -19,17 +19,16 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
+        <head>
+            <title>Catenary Tulip</title>
+        </head>
         <Script>
         """
         if(localStorage.getItem('theme') === 'dark') {
             document.querySelector('html').classList.add('dark');
         }
-        var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' } }
         """
         </Script>
-        <Script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js"></Script>
-        <Script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.nls.js"></Script>
-        <Script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/editor/editor.main.js"></Script>
         <Stylesheet id="font" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" />
         <Stylesheet id="icons" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <Stylesheet id="leptos" href="/pkg/catenarytulip.css"/>
@@ -74,8 +73,8 @@ fn Home() -> impl IntoView {
         <img src="https://i0.wp.com/art.metro.net/wp-content/uploads/2022/09/KLine_FairviewHeights_KimSchoenstadt2-Large.jpeg" class="border-b-2 border-tulip w-[100vw] h-[450px] object-cover" style="z-index:-1;" />
         <span class="text-sm text-tulip m-2">"Kim Schoenstadt, "<i>"Inglewood CA Series: Metro collection 1-10"</i></span>
         <main class="m-8 text-center">
-            <h1 class="text-4xl font-bold text-tulip mb-12">"Welcome to Tulip!"</h1>
-            <a href="/realtimekeys" class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 mt-12 text-lg font-bold">"Realtime Key Manager"</a>
+            <h1 class="text-4xl font-bold text-tulip mb-8">"Welcome to Tulip!"</h1>
+            <a href="/realtimekeys" class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 mt-8 text-lg font-bold">"Realtime Key Manager"</a>
         </main>
     }
 }
