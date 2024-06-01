@@ -2,8 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-.bigmoore {
-    font-family: "bigmoore", serif;
+* {
+  font-family: "Barlow", sans-serif;
+}
+
+.lines-content * {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+html {
+  background-color: white;
+  color: black;
+}
+
+body {
+  color: black;
+}
+
+html.dark {
+  background-color: #06121F;
+}
+
+html.dark body {
+  color: #FFFFFF;
+}
+
+code {
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 /* Color styles */
@@ -28,40 +53,3 @@
 .hh19 { color: #F0ADA8; } /* comment */
 .hh20 { color: #D2D7B4; } /* macro */
 .hh21 { color: #D2D7B4; } /* label */
-
-/* Code block styles */
-.code-block {
-
-  /* background-color: #F1FAEE;
-  border-radius: 5px;
-  padding: 2.1em 2em;
-  font-size: 14px;
-  line-height: 1.4em;
-  position: relative;
-  max-width: fit-content;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  font-style: normal;
-  max-width: 800px;
-  overflow-x: scroll; */
-}
-
-.code-block .language-tag {
-  display: none;
-  /* position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 14px;
-  background-color: #a5a5a5;
-  color: #0c181d;
-  border-radius: 0 5px 0 5px;
-  padding: 2px 7px;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-style: normal; */
-}
-
-.code-block .code-block-inner {
-  font-family: 'courier new', courier, monospace;
-  font-style: normal;
-
-}

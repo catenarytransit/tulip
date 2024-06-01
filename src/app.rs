@@ -19,24 +19,26 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <Stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"/>
-        <Script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"/>
-        <Script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"/>
+        <head>
+            <title>Catenary Tulip</title>
+        </head>
         <Script>
-        "hljs.highlightAll();"
+        """
+        if(localStorage.getItem('theme') === 'dark') {
+            document.querySelector('html').classList.add('dark');
+        }
+        """
         </Script>
-        <Stylesheet id="AdobeFonts" href="https://use.typekit.net/nhx0pgc.css"/>
+        <Stylesheet id="font" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" />
+        <Stylesheet id="icons" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <Stylesheet id="leptos" href="/pkg/catenarytulip.css"/>
-        <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico"/>
+        <Link rel="shortcut icon" href="/favicon.svg"/>
         <Router>
             <Routes>
-                <Route path="/" view=move || view! { <Home/> }/>
-                <Route path="/realtimekeys" view=move || view! { <RealtimeKeys
-
-                    /> }/>
-                <Route path="/leptosexample" view=move || view! { <LeptosExample
-                    /> }/>
-                <Route path="/404.html" view=move || view! { <NotFound/> }/>
+                <Route path="/" view=move || view! { <Home /> }/>
+                <Route path="/realtimekeys" view=move || view! { <RealtimeKeys /> }/>
+                <Route path="/help" view=move || view! { <Help /> }/>
+                <Route path="/404.html" view=move || view! { <NotFound /> }/>
             </Routes>
         </Router>
     }
@@ -45,18 +47,21 @@ pub fn App() -> impl IntoView {
 #[component]
 fn Nav() -> impl IntoView {
     view! {
-        <div class="w-full border-b-2 border-gray-200 drop-shadow-2xl flex flex-row align-middle mx-2 my-2 items-center">
-            <a href="https://catenarymaps.org" target="_blank">
-                <img src="/LogoSharpCorners.png" class="h-8 "/>
-            </a>
+        <div class="sticky top-0 left-0 w-full bg-gray dark:bg-darksky p-4 border-b-2 border-tulip text-tulip flex flex-row justify-between">
             <a href="/">
-                <img src="/tulip-logo.png" class="h-12"/>
-
+                <img alt="Tulip" src="/tulip.svg" class="h-12"/>
             </a>
-            <a href="/">
-                <p class="text-3xl italic bigmoore align-middle">"Tulip"</p>
-            </a>
-
+            <div class="space-x-4 flex self-center">
+                <a href="/realtimekeys" class="material-symbols-outlined">
+                    "key"
+                </a>
+                <a href="/help" class="material-symbols-outlined">
+                    "help"
+                </a>
+                <a href="#" class="material-symbols-outlined" onclick="document.querySelector('html').classList.toggle('dark'); window.localStorage.theme == 'dark' ? window.localStorage.theme = 'light' : window.localStorage.theme = 'dark'">
+                    "brightness_6"
+                </a>
+            </div>
         </div>
     }
 }
@@ -65,11 +70,32 @@ fn Nav() -> impl IntoView {
 fn Home() -> impl IntoView {
     view! {
         <Nav/>
-        <main class="mx-2">
-        <h1>"Administration Links:"</h1>
-        <ul>
-            <li><a href="/realtimekeys" class="text-blue-500 underline">"Realtime Keys"</a></li>
-        </ul>
+        <img src="https://i0.wp.com/art.metro.net/wp-content/uploads/2022/09/KLine_FairviewHeights_KimSchoenstadt2-Large.jpeg" class="border-b-2 border-tulip w-[100vw] h-[450px] object-cover" style="z-index:-1;" />
+        <span class="text-sm text-tulip m-2">"Kim Schoenstadt, "<i>"Inglewood CA Series: Metro collection 1-10"</i></span>
+        <main class="m-8 text-center">
+            <h1 class="text-4xl font-bold text-tulip mb-8">"Welcome to Tulip!"</h1>
+            <a href="/realtimekeys" class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 mt-8 text-lg font-bold">"Realtime Key Manager"</a>
+        </main>
+    }
+}
+
+#[component]
+fn Help() -> impl IntoView {
+    view! {
+        <Nav/>
+        <main class="m-8">
+            <h1 class="text-2xl font-bold text-tulip mb-4">"Instructions"</h1>
+            <h1 class="text-xl font-bold text-tulip mb-2">"Realtime Key Manager"</h1>
+            <p> "Keys are defined as "<code class="mx-1">"Option<PasswordFormat>"</code>" as defined in this structure here:"</p>
+            <div id="example-password h-[400px]"></div>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
+            <p class="font-bold">"Every password entry is required to have the same length as key_format. Uploads will be blocked otherwise."</p>
+            <p>"The fetch interval is the number of milliseconds between fetches of the realtime data. Putting None will default the value to what Alpenrose has."</p>
+            <br />
+            <p>"Here's an imaginary entry for data from the Washington Metropolitan Area Transit Authority (WMATA):"</p>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
+            <p>"Here's an imaginary entry for the San Francisco Bay Area data feed (Bay Area 511), but let's pretend we need to set the vehicle position url manually:"</p>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
         </main>
     }
 }
@@ -250,29 +276,25 @@ fn RealtimeKeys() -> impl IntoView {
 
     view! {
         <Nav/>
-        <main class="mx-4">
-            <h1 class="text-lg font-bold">"Realtime Keys"</h1>
-
-            <p>"Enter the master password to view the realtime keys."</p>
-
-            <p>"Master Email"</p>
+        <main class="p-8">
+            <h1 class="text-2xl font-bold text-tulip">"Realtime Key Manager"</h1>
+            <p>"Please confirm your Tulip login credentials, as key information is sensitive and confidential."</p>
 
             <input
                 type="email"
+                placeholder="Email"
                 prop:value=move || master_email.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold mr-4"
                 on:input=move |event| {
                     set_master_email(event_target_value(&event));
                     set_master_creds((event_target_value(&event), master_password.get()));
                 }
             />
-
-            <p>"Master Password"</p>
-
             <input
                 type="password"
+                placeholder="Password"
                 prop:value=move || master_password.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 on:input=move |event| {
                     set_master_password(event_target_value(&event));
                     set_master_creds((master_email.get(), event_target_value(&event)));
@@ -280,9 +302,7 @@ fn RealtimeKeys() -> impl IntoView {
             />
 
             <br/>
-
-            //load button
-            <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+            <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
             on:input=move |event| set_count.update(|count| *count += 1)
             >"Load"</button>
 
@@ -291,59 +311,28 @@ fn RealtimeKeys() -> impl IntoView {
                     move || if authorised.get() {
                         view! {
                             <p>"Authorised"</p>
-                        }
-                    } else {
-                        view! {
-                            <p>"Not authorised"</p>
-                        }
-                    }
-                }
-
-                <h2 class="text-xl font-semibold">"Instructions"</h2>
-
-                <p> "Keys are defined as Option<PasswordFormat> as defined in this structure here:"</p>
-
-                        //code=STRUCT_PASSWORD_TEXT.to_string()
-
-                        <pre><code class="language-rust">{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
-
-                    <p>"Every password entry is required to have the same length as key_format. Uploads will be blocked otherwise."</p>
-                    <p>"The fetch interval is the number of milliseconds between fetches of the realtime data. Putting None will default the value to what Alpenrose has."</p>
-
-                    <p>"Here's an imaginary api for Washington Metro Area Transit Authority"</p>
-
-                    <pre><code class="language-rust">{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(),
-                    ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
-
-                    <p>"Here's an imaginary api for San Francisco Bay Area Transit Authority, but pretend we set the vehicle position url manually"</p>
-
-                    <pre><code class="language-rust">{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(),
-                        ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
-                    <div>
-                    <h2 class="text-xl font-semibold">"Realtime Keys"</h2>
+                            <h2 class="text-xl font-semibold">"Realtime Keys"</h2>
 
                     //reload button
                     <button
                     on:click=move |e| {
                          async_data_load.refetch();
                     }
-                    class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                    class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                     >
                         "Reload"
                     </button>
                      
-                    <ul>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {
                         move ||
                             original_keys.with(|keys| keys.iter().map(|(key, value)| {
                                 view! {
                                     <li>
-                                    <h3 class="text-lg font-semibold">{key.clone()}</h3>
-                                        <p class="font-bold">"Current values"</p>
+                                        <h3 class="text-lg font-semibold">{key.clone()}</h3>
                                         <p class="font-semibold">"Passwords:"</p>
-                                        <p class="bg-gray-100 font-mono">{format!("{}", ron::ser::to_string_pretty(&value.passwords,
-                                            ron::ser::PrettyConfig::default()).unwrap())}</p>
-
+                                        <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-scroll h-[300px]"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
+                                            ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
                                         <p class="font-semibold">"Fetch Interval:"</p>
                                         <p>{format!("{:?}", value.fetch_interval_ms)}</p>
                                     </li>
@@ -352,14 +341,13 @@ fn RealtimeKeys() -> impl IntoView {
                      }
 
                     </ul>
-                </div>
 
                 <div><h2 class="text-xl font-semibold">
                 "Submission form"
-                </h2>
+                </h2></div>
 
                 <div class="flex flex-row gap-x-2">
-                     <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                     <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
 
                     on:click=move |_| {
                         set_form_feed_id(String::from(""));
@@ -369,7 +357,7 @@ fn RealtimeKeys() -> impl IntoView {
                     disabled=move || !authorised.get()
                      >"Clear all fields"</button>
 
-                        <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                        <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                         on:click=move |_| {
                             set_form_password(format!("{}",
 
@@ -382,7 +370,7 @@ fn RealtimeKeys() -> impl IntoView {
                         "Fill with default password format"
                     </button>
 
-                    <button class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                    <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                         on:click=move |_| {
                             match original_keys.get().get(form_feed_id.get().as_str()) {
                                 Some(original_data) => {
@@ -414,7 +402,7 @@ fn RealtimeKeys() -> impl IntoView {
                 type="text"
                 prop:value=move || form_feed_id.get()
                 disabled=move || !authorised.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 on:input=move |event| {
                     set_form_feed_id(event_target_value(&event));
                 }
@@ -439,7 +427,7 @@ fn RealtimeKeys() -> impl IntoView {
             <input
                 type="text"
                 prop:value=move || form_interval_ms.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
                 on:input=move |event| {
                     set_form_interval_ms(event_target_value(&event));
@@ -465,7 +453,7 @@ fn RealtimeKeys() -> impl IntoView {
                 type="text"
                 prop:value=move || form_password.get()
                 disabled=move || !authorised.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold h-[400px]"
                 on:input=move |event| {
                     set_form_password(event_target_value(&event));
                 }
@@ -509,7 +497,7 @@ fn RealtimeKeys() -> impl IntoView {
 
             <button
 
-                class="bg-blue-500 text-white border font-bold py-2 px-4 rounded"
+                class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
             on:click=move |e| {
               let master_creds = master_creds.get();
@@ -523,14 +511,16 @@ fn RealtimeKeys() -> impl IntoView {
               });
             }
                 >"Submit"</button>
-
-                </div>
-
+                        }
+                    } else {
+                        view! {
+                            <>
+                            <p>"Not authorised"</p>
+                            </>
+                        }
+                    }
+                }
         </main>
-
-    <Script>
-    "hljs.highlightAll();"
-    </Script>
     }
 }
 
@@ -612,29 +602,6 @@ fn NotFound() -> impl IntoView {
         <Nav/>
         <main class="h-full w-full">
             <div class="m-auto">"404, this page doesn't exist"</div>
-        </main>
-    }
-}
-
-#[component]
-fn LeptosExample() -> impl IntoView {
-    let (count, set_count) = create_signal(0);
-
-    view! {
-        <main class="my-0 mx-auto max-w-3xl text-center">
-            <h2 class="p-6 text-4xl">"Welcome to Leptos with Tailwind"</h2>
-            <p class="px-10 pb-10 text-left">
-                "Tailwind will scan your Rust files for Tailwind class names and compile them into a CSS file."
-            </p>
-            <button
-                class="bg-amber-600 hover:bg-sky-700 px-5 py-3 text-white rounded-lg"
-                on:click=move |_| set_count.update(|count| *count += 1)
-            >
-                "Something's here | "
-                {move || if count() == 0 { "Click me!".to_string() } else { count().to_string() }}
-
-                " | Some more text"
-            </button>
         </main>
     }
 }
