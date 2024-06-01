@@ -74,7 +74,7 @@ fn Home() -> impl IntoView {
         <img src="https://i0.wp.com/art.metro.net/wp-content/uploads/2022/09/KLine_FairviewHeights_KimSchoenstadt2-Large.jpeg" class="border-b-2 border-tulip w-[100vw] h-[450px] object-cover" style="z-index:-1;" />
         <span class="text-sm text-tulip m-2">"Kim Schoenstadt, "<i>"Inglewood CA Series: Metro collection 1-10"</i></span>
         <main class="m-8 text-center">
-            <h1 class="text-4xl font-bold text-tulip">"Welcome to Tulip!"</h1>
+            <h1 class="text-4xl font-bold text-tulip mb-12">"Welcome to Tulip!"</h1>
             <a href="/realtimekeys" class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 mt-12 text-lg font-bold">"Realtime Key Manager"</a>
         </main>
     }
