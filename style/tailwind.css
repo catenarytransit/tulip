@@ -10,13 +10,20 @@
   font-family: 'IBM Plex Mono', monospace;
 }
 
-html, body {
+html {
   background-color: white;
   color: black;
 }
 
-html.dark, html.dark body {
+body {
+  color: black;
+}
+
+html.dark {
   background-color: #06121F;
+}
+
+html.dark body {
   color: #FFFFFF;
 }
 

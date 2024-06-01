@@ -71,11 +71,11 @@ fn Nav() -> impl IntoView {
 fn Home() -> impl IntoView {
     view! {
         <Nav/>
-        <main class="m-8">
-            <h1 class="text-2xl font-bold text-tulip">"Welcome to Tulip!"</h1>
-            <ul>
-                <li><a href="/realtimekeys" class="text-blue-500 underline">"Realtime Keys"</a></li>
-            </ul>
+        <img src="https://i0.wp.com/art.metro.net/wp-content/uploads/2022/09/KLine_FairviewHeights_KimSchoenstadt2-Large.jpeg" class="border-b-2 border-tulip w-[100vw] h-[450px] object-cover" style="z-index:-1;" />
+        <span class="text-sm text-tulip m-2">"Kim Schoenstadt, "<i>"Inglewood CA Series: Metro collection 1-10"</i></span>
+        <main class="m-8 text-center">
+            <h1 class="text-4xl font-bold text-tulip">"Welcome to Tulip!"</h1>
+            <a href="/realtimekeys" class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 mt-12 text-lg font-bold">"Realtime Key Manager"</a>
         </main>
     }
 }
@@ -334,7 +334,7 @@ fn RealtimeKeys() -> impl IntoView {
                                     <li>
                                         <h3 class="text-lg font-semibold">{key.clone()}</h3>
                                         <p class="font-semibold">"Passwords:"</p>
-                                        <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
+                                        <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-scroll h-[300px]"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
                                             ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
                                         <p class="font-semibold">"Fetch Interval:"</p>
                                         <p>{format!("{:?}", value.fetch_interval_ms)}</p>
@@ -430,7 +430,7 @@ fn RealtimeKeys() -> impl IntoView {
             <input
                 type="text"
                 prop:value=move || form_interval_ms.get()
-                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
                 on:input=move |event| {
                     set_form_interval_ms(event_target_value(&event));
@@ -456,7 +456,7 @@ fn RealtimeKeys() -> impl IntoView {
                 type="text"
                 prop:value=move || form_password.get()
                 disabled=move || !authorised.get()
-                class= "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold h-[400px]"
                 on:input=move |event| {
                     set_form_password(event_target_value(&event));
                 }
