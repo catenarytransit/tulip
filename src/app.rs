@@ -453,7 +453,7 @@ fn RealtimeKeys() -> impl IntoView {
                 type="text"
                 prop:value=move || form_password.get()
                 disabled=move || !authorised.get()
-                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold h-[400px]"
+                class= "w-full bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-base h-[400px]"
                 on:input=move |event| {
                     set_form_password(event_target_value(&event));
                 }
