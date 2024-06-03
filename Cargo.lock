@@ -1282,6 +1282,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 
 [[package]]
+name = "glob"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
+
+[[package]]
 name = "globset"
 version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1899,24 +1905,29 @@ dependencies = [
 
 [[package]]
 name = "leptos-fluent"
-version = "0.0.21"
+version = "0.0.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4d2515f8e238eacfc1d18b42417fa86c7e0ddde643528fb9a158f1b53c61d63"
+checksum = "fc90c79816eab19013e6a2e3f162bdf2e38309ab2798aa9ddb4317f6b2e281e9"
 dependencies = [
- "cfg-if 1.0.0",
  "fluent-templates",
  "leptos",
  "leptos-fluent-macros",
- "once_cell",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
 name = "leptos-fluent-macros"
-version = "0.0.21"
+version = "0.0.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ce31d433af9f37a66ad8f2c735e186f469fbd9a6ed71cea8212b90be3a77c05"
+checksum = "d6c7bee0c58e4db80a6721e8e6b0c0f13923d07a82e3cc756b0a1e157b7854df"
 dependencies = [
- "cfg-if 1.0.0",
+ "fluent-syntax",
+ "fluent-templates",
+ "flume",
+ "glob",
+ "ignore",
+ "pathdiff",
  "proc-macro2",
  "quote",
  "serde_json",
