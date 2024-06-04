@@ -20,7 +20,7 @@ async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
         "cohere-ai"
     ];
 
-    let robots_banned_bots = banned_bots.join("\nDisallow: /\n\n");
+    let robots_banned_bots = banned_bots.map(|x| format!("User-agent: {}", x)).join("\nDisallow: /\n\n");
 
     HttpResponse::Ok()
         .insert_header(("Content-Type", "text/plain"))
