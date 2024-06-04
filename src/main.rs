@@ -22,9 +22,9 @@ async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
 
     let robots_banned_bots = banned_bots
         .into_iter()
-        .map(|x| format!("User-agent: {}", x))
+        .map(|x| format!("User-agent: {}\nDisallow: /", x))
         .collect::<Vec<String>>()
-        .join("\nDisallow: /\n\n");
+        .join("\n\n");
 
     actix_web::HttpResponse::Ok()
         .insert_header(("Content-Type", "text/plain"))
