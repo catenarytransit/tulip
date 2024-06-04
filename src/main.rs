@@ -26,7 +26,7 @@ async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
         .collect::<Vec<String>>()
         .join("\nDisallow: /\n\n");
 
-    HttpResponse::Ok()
+    actix_web::HttpResponse::Ok()
         .insert_header(("Content-Type", "text/plain"))
         .body(robots_banned_bots)
 }
