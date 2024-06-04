@@ -52,8 +52,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(actix_block_ai_crawling::BlockAi)
             .leptos_routes(leptos_options.to_owned(), routes.to_owned(), App)
-            .service(Files::new("/", site_root))
             .route("robots.txt", web::get().to(robots))
+            .service(Files::new("/", site_root))
             .wrap(middleware::Compress::default())
     })
     .bind(&addr)?
