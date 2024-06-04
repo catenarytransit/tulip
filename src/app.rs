@@ -188,7 +188,7 @@ async fn submit_data(
     master_password: String,
     feed_id: String,
     password: String,
-    interval: String
+    interval: String,
 ) -> Result<bool, ServerFnError> {
     //post json EachPasswordRow to /setrealtimekey/{feed_id}/
 
@@ -210,7 +210,7 @@ async fn submit_data(
         .send()
         .await?;
 
-        let status = response.status();
+    let status = response.status();
 
     match status {
         reqwest::StatusCode::OK => Ok(true),
@@ -220,13 +220,17 @@ async fn submit_data(
 
             match text {
                 Ok(text) => {
-                    println!("recieved strange answer from birch on setrealtimekey, {} text {}", status, text);
-                },
+                    println!(
+                        "recieved strange answer from birch on setrealtimekey, {} text {}",
+                        status, text
+                    );
+                }
                 Err(err) => {
                     println!("error on birch setrealtimekey {} err {}", status, err);
                 }
             }
-            Err(ServerFnError::new("Data did not submit correctly"))},
+            Err(ServerFnError::new("Data did not submit correctly"))
+        }
     }
 }
 
@@ -329,7 +333,7 @@ fn RealtimeKeys() -> impl IntoView {
                     >
                         "Reload"
                     </button>
-                     
+
                     <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                      {
                         move ||
