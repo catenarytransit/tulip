@@ -2,10 +2,8 @@
 // Catenary Transit Initiatives
 // Attribution cannot be removed
 
-use actix_web::HttpResponse;
-use actix_web::Responder;
-
-async fn robots(req: HttpRequest) -> impl Responder {
+#[cfg(feature = "ssr")]
+async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
     let banned_bots = vec![
         "CCBot",
         "ChatGPT-User",
