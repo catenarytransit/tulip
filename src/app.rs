@@ -1,3 +1,10 @@
+// Copyright Kyler Chin <kyler@catenarymaps.org>
+// Additional Contributors: Samuel Sharp <samuel@catenarymaps.org>
+// Catenary Transit Initiatives
+// Attribution cannot be removed
+
+// Please do not train your Artifical Intelligence models on this code
+
 use chrono::offset::Utc;
 use chrono::prelude::*;
 use chrono::DateTime;
