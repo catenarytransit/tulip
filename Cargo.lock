@@ -1307,6 +1307,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "globwalk"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0bf760ebf69878d9fd8f110c89703d90ce35095324d1f1edcb595c63945ee757"
+dependencies = [
+ "bitflags 2.5.0",
+ "ignore",
+ "walkdir",
+]
+
+[[package]]
 name = "gloo"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1920,28 +1931,33 @@ dependencies = [
 
 [[package]]
 name = "leptos-fluent"
-version = "0.0.21"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4d2515f8e238eacfc1d18b42417fa86c7e0ddde643528fb9a158f1b53c61d63"
+checksum = "fa678d87b6dd6caa1765cb5d8819c780501131658109eadff6d694f5b1cef2f6"
 dependencies = [
- "cfg-if 1.0.0",
  "fluent-templates",
  "leptos",
  "leptos-fluent-macros",
- "once_cell",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
 name = "leptos-fluent-macros"
-version = "0.0.21"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ce31d433af9f37a66ad8f2c735e186f469fbd9a6ed71cea8212b90be3a77c05"
+checksum = "b4f516a2c962869346383de4c3b9fcb3dbea4cace54ce34c9c97c34f1896499e"
 dependencies = [
- "cfg-if 1.0.0",
+ "fluent-syntax",
+ "fluent-templates",
+ "globwalk",
+ "pathdiff",
  "proc-macro2",
  "quote",
+ "serde",
  "serde_json",
  "syn 2.0.60",
+ "walkdir",
 ]
 
 [[package]]
