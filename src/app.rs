@@ -21,6 +21,8 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 
+static GTFSRAWOPTIONS: [(&str, &str);3] = [("Vehicles", "vehicle"), ("Trip Updates", "trip"), ("Alerts", "alert")];
+
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
@@ -341,6 +343,17 @@ fn RealtimeKeys() -> impl IntoView {
                                 view! {
                                     <li>
                                         <h3 class="text-lg font-semibold">{key.clone()}</h3>
+                                        {
+                                            GTFSRAWOPTIONS.iter().map(|(name_of_feed_type, feed_type)|  view! {
+                                                <p class="font-semibold">{name_of_feed_type.to_string()} {" "}
+                                                <a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}", key.clone(), feed_type.clone())}>"Protobuf"</a>
+                                                {" "}
+                                                <a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}&format=json", key.clone(), feed_type.clone())}>"Json"</a>
+                                                {" "}<a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}&format=ron", key.clone(), feed_type.clone())}>"Ron"</a>
+                                                </p>
+                                            }).collect_view()
+                                        }
+                                       
                                         <p class="font-semibold">"Passwords:"</p>
                                         <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-scroll h-[300px]"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
                                             ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
