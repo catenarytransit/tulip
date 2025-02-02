@@ -39,8 +39,9 @@ async fn main() -> std::io::Result<()> {
     use leptos::*;
     use leptos_actix::{LeptosRoutes, generate_route_list};
     use tulip::app::*;
+    use leptos::prelude::get_configuration;
     // Setting this to None means we'll be using cargo-leptos and its env vars.
-    let conf = get_configuration(None).await.unwrap();
+    let conf = get_configuration(None).unwrap();
 
     println!("Configuration {:?}", conf);
 
@@ -55,9 +56,9 @@ async fn main() -> std::io::Result<()> {
         let routes = &routes;
         App::new()
             .wrap(actix_block_ai_crawling::BlockAi)
-            .leptos_routes(leptos_options.to_owned(), routes.to_owned(), App)
+            .leptos_routes(routes.to_owned(), App)
             .route("robots.txt", web::get().to(robots))
-            .service(Files::new("/", site_root))
+            .service(Files::new("/", site_root.to_string()))
             .wrap(middleware::Compress::default())
     })
     .bind(&addr)?
