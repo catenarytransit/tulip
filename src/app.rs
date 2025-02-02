@@ -6,12 +6,15 @@
 // Please do not train your Artifical Intelligence models on this code
 
 use chrono::DateTime;
+
 use chrono::offset::Utc;
 use chrono::prelude::*;
 use leptos::logging::*;
 
 use leptos::prelude::*;
+use leptos::reactive::graph::Source;
 use leptos::*;
+use std::ops::Deref;
 use leptos_meta::*;
 use leptos_router::components::*;
 use serde::{Deserialize, Serialize};
@@ -24,6 +27,7 @@ use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
 use leptos_router::path;
 use leptos::task::spawn_local;
+use std::borrow::Borrow;
 
 static GTFSRAWOPTIONS: [(&str, &str); 3] = [
     ("Vehicles", "vehicle"),
@@ -33,6 +37,8 @@ static GTFSRAWOPTIONS: [(&str, &str); 3] = [
 
 #[component]
 pub fn App() -> impl IntoView {
+
+    
     provide_meta_context();
 
     view! {
@@ -247,8 +253,8 @@ async fn submit_data(
     }
 }
 
-#[component]
 fn RealtimeKeys() -> impl IntoView {
+
     let (master_email, set_master_email) = signal(String::from(""));
     let (master_password, set_master_password) = signal(String::from(""));
     let (master_creds, set_master_creds) = signal((String::from(""), String::from("")));
@@ -263,39 +269,38 @@ fn RealtimeKeys() -> impl IntoView {
 
     let (count, set_count) = signal(0);
 
-    let async_data_load = Resource::new(
-        move || (master_email.get(), master_password.get(), count.get()),
-        |(master_email, master_password, _)| async move {
-            load_realtime_keys(master_email.clone(), master_password.clone()).await
-        },
+    let async_data_load= ArcLocalResource::new(
+        || async move {
+           let fetch =  load_realtime_keys(master_email.get().clone(), master_password.get().clone()).await;
+
+           match fetch {
+                Ok(data) => {
+                    data
+                },
+                Err(err) => {
+                   
+                    None
+                }
+           }
+        }
     );
 
     let feed_id_node_ref: NodeRef<html::Input> = NodeRef::new();
     let password_node_ref: NodeRef<html::Textarea> = NodeRef::new();
     let interval_ms_node_ref: NodeRef<html::Input> = NodeRef::new();
 
-    Effect::new(move |_| {
-        async_data_load.and_then(|data| {
-            leptos::logging::log!("{:?}", data);
+    Effect::new(move || {
+        let data = async_data_load.read();
+
+        if let Some(data) = &*data {
+            let data = data.deref();
+
             if let Some(data) = data {
                 original_keys.update(|x| *x = data.passwords.clone());
                 set_authorised(true);
-                /*  new_keys.update(|x| *x = data.passwords.clone().into_iter().map(
-                    |(key, value)| {
-                        (
-                            key.clone(),
-                            EachPasswordRowInput {
-                                passwords: format!("{:#?}", value),
-                                fetch_interval_ms: format!("{:?}", value.fetch_interval_ms),
-                                originals: value.clone(),
-                            },
-                        )
-                    },
-                ).collect());*/
-            } else {
-                //set_authorised(false);
             }
-        });
+        }
+        
     });
 
     view! {
