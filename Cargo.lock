@@ -4333,6 +4333,7 @@ dependencies = [
  "leptos_router",
  "log",
  "qstring",
+ "reactive_graph",
  "reqwest",
  "ron",
  "serde",

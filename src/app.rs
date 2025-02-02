@@ -18,6 +18,7 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::components::*;
 use leptos_router::path;
+use reactive_graph::graph::ToAnySource;
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 use std::collections::BTreeMap;
@@ -252,6 +253,8 @@ async fn submit_data(
 }
 
 fn RealtimeKeys() -> impl IntoView {
+    
+    use reactive_graph::graph::Subscriber;
     let (master_email, set_master_email) = signal(String::from(""));
     let (master_password, set_master_password) = signal(String::from(""));
     let (master_creds, set_master_creds) = signal((String::from(""), String::from("")));
@@ -269,7 +272,6 @@ fn RealtimeKeys() -> impl IntoView {
     let async_data_load = ArcLocalResource::new(move || {
         let master_email = master_email.get().clone();
         let master_password = master_password.get().clone();
-        let counter = count.get();
 
         async {
             let fetch =
@@ -281,6 +283,10 @@ fn RealtimeKeys() -> impl IntoView {
             }
         }
     });
+
+    async_data_load.add_source(count.to_any_source());
+    async_data_load.add_source(master_email.to_any_source());
+    async_data_load.add_source(master_password.to_any_source());
 
     let feed_id_node_ref: NodeRef<html::Input> = NodeRef::new();
     let password_node_ref: NodeRef<html::Textarea> = NodeRef::new();

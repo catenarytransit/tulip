@@ -39,6 +39,7 @@ serde-wasm-bindgen = "0.6.5"
 argon2 = "0.5.3"
 ron = "0.8.1"
 actix_block_ai_crawling = {version = "0.2.8", optional = true}
+reactive_graph = "0.1.5"
 
 [features]
 csr = ["leptos/csr"]
