@@ -266,13 +266,19 @@ fn RealtimeKeys() -> impl IntoView {
 
     let (count, set_count) = signal(0);
 
-    let async_data_load = ArcLocalResource::new(|| async move {
-        let fetch =
-            load_realtime_keys(master_email.get().clone(), master_password.get().clone()).await;
+    let async_data_load = ArcLocalResource::new(move || {
+        let master_email = master_email.get().clone();
+        let master_password = master_password.get().clone();
+        let counter = count.get();
 
-        match fetch {
-            Ok(data) => data,
-            Err(err) => None,
+        async {
+            let fetch =
+                load_realtime_keys(master_email, master_password).await;
+    
+            match fetch {
+                Ok(data) => data,
+                Err(err) => None,
+            }
         }
     });
 
@@ -323,7 +329,8 @@ fn RealtimeKeys() -> impl IntoView {
             <br/>
             <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
             on:input=move |event| {
-                async_data_load.refetch();
+                //async_data_load.refetch();
+                set_count(count.get() + 1);
             }
             >"Load"</button>
 
@@ -337,7 +344,8 @@ fn RealtimeKeys() -> impl IntoView {
                     //reload button
                     <button
                     on:click=move |e| {
-                         async_data_load.refetch();
+                        // async_data_load.refetch();
+                        set_count(count.get() + 1);
                     }
                     class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                     >
@@ -544,7 +552,8 @@ fn RealtimeKeys() -> impl IntoView {
 
               spawn_local(async move {
                 submit_data(master_creds.0, master_creds.1, form_feed_id, form_password, form_interval_ms).await;
-                async_data_load.refetch();
+                set_count(count.get() + 1);
+                //async_data_load.refetch();
               });
             }
                 >"Submit"</button>
