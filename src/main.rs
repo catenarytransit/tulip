@@ -36,10 +36,10 @@ async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
 async fn main() -> std::io::Result<()> {
     use actix_files::Files;
     use actix_web::*;
+    use leptos::prelude::get_configuration;
     use leptos::*;
     use leptos_actix::{LeptosRoutes, generate_route_list};
     use tulip::app::*;
-    use leptos::prelude::get_configuration;
     // Setting this to None means we'll be using cargo-leptos and its env vars.
     let conf = get_configuration(None).unwrap();
 

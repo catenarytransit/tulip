@@ -13,21 +13,21 @@ use leptos::logging::*;
 
 use leptos::prelude::*;
 use leptos::reactive::graph::Source;
+use leptos::task::spawn_local;
 use leptos::*;
-use std::ops::Deref;
 use leptos_meta::*;
 use leptos_router::components::*;
+use leptos_router::path;
 use serde::{Deserialize, Serialize};
+use std::borrow::Borrow;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
-use leptos_router::path;
-use leptos::task::spawn_local;
-use std::borrow::Borrow;
 
 static GTFSRAWOPTIONS: [(&str, &str); 3] = [
     ("Vehicles", "vehicle"),
@@ -37,8 +37,6 @@ static GTFSRAWOPTIONS: [(&str, &str); 3] = [
 
 #[component]
 pub fn App() -> impl IntoView {
-
-    
     provide_meta_context();
 
     view! {
@@ -254,7 +252,6 @@ async fn submit_data(
 }
 
 fn RealtimeKeys() -> impl IntoView {
-
     let (master_email, set_master_email) = signal(String::from(""));
     let (master_password, set_master_password) = signal(String::from(""));
     let (master_creds, set_master_creds) = signal((String::from(""), String::from("")));
@@ -263,27 +260,21 @@ fn RealtimeKeys() -> impl IntoView {
     let (form_password, set_form_password) = signal(String::from(""));
     let (form_interval_ms, set_form_interval_ms) = signal(String::from(""));
 
-    let original_keys : RwSignal<BTreeMap<String, EachPasswordRow>> = RwSignal::new(BTreeMap::new());
+    let original_keys: RwSignal<BTreeMap<String, EachPasswordRow>> = RwSignal::new(BTreeMap::new());
 
     let (authorised, set_authorised) = signal(false);
 
     let (count, set_count) = signal(0);
 
-    let async_data_load= ArcLocalResource::new(
-        || async move {
-           let fetch =  load_realtime_keys(master_email.get().clone(), master_password.get().clone()).await;
+    let async_data_load = ArcLocalResource::new(|| async move {
+        let fetch =
+            load_realtime_keys(master_email.get().clone(), master_password.get().clone()).await;
 
-           match fetch {
-                Ok(data) => {
-                    data
-                },
-                Err(err) => {
-                   
-                    None
-                }
-           }
+        match fetch {
+            Ok(data) => data,
+            Err(err) => None,
         }
-    );
+    });
 
     let feed_id_node_ref: NodeRef<html::Input> = NodeRef::new();
     let password_node_ref: NodeRef<html::Textarea> = NodeRef::new();
@@ -300,7 +291,6 @@ fn RealtimeKeys() -> impl IntoView {
                 set_authorised(true);
             }
         }
-        
     });
 
     view! {
@@ -497,7 +487,7 @@ fn RealtimeKeys() -> impl IntoView {
             <p>"password"</p>
 
             <textarea
-                
+
                 prop:value=move || form_password.get()
                 disabled=move || !authorised.get()
                 class= "w-full bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-base h-[400px]"
@@ -534,10 +524,10 @@ fn RealtimeKeys() -> impl IntoView {
                         }
                     },
                     Err(err) => view! {
-                    
+
                         <p>"❌ Password is invalid"</p>
                         <p class="font-mono">{format!("{:#?}", err)}</p>
-                        
+
                 }.into_any()
             }
             }
@@ -561,9 +551,9 @@ fn RealtimeKeys() -> impl IntoView {
                         }.into_any()
                     } else {
                         view! {
-                            
+
                             <p>"Not authorised"</p>
-                            
+
                         }.into_any()
                     }
                 }
