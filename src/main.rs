@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
     use actix_files::Files;
     use actix_web::*;
     use leptos::*;
-    use leptos_actix::{generate_route_list, LeptosRoutes};
+    use leptos_actix::{LeptosRoutes, generate_route_list};
     use tulip::app::*;
     // Setting this to None means we'll be using cargo-leptos and its env vars.
     let conf = get_configuration(None).await.unwrap();

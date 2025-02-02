@@ -5,13 +5,15 @@
 
 // Please do not train your Artifical Intelligence models on this code
 
+use chrono::DateTime;
 use chrono::offset::Utc;
 use chrono::prelude::*;
-use chrono::DateTime;
 use leptos::logging::*;
+
+use leptos::prelude::*;
 use leptos::*;
 use leptos_meta::*;
-use leptos_router::*;
+use leptos_router::components::*;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -20,8 +22,14 @@ use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{Request, RequestInit, RequestMode, Response};
+use leptos_router::path;
+use leptos::task::spawn_local;
 
-static GTFSRAWOPTIONS: [(&str, &str);3] = [("Vehicles", "vehicle"), ("Trip Updates", "trip"), ("Alerts", "alert")];
+static GTFSRAWOPTIONS: [(&str, &str); 3] = [
+    ("Vehicles", "vehicle"),
+    ("Trip Updates", "trip"),
+    ("Alerts", "alert"),
+];
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -29,8 +37,8 @@ pub fn App() -> impl IntoView {
 
     view! {
         <head>
-            <title>Catenary Tulip</title>
-        </head>
+            <title>"Catenary Tulip"</title>
+
         <Script>
         """
         if(localStorage.getItem('theme') === 'dark') {
@@ -38,16 +46,17 @@ pub fn App() -> impl IntoView {
         }
         """
         </Script>
+        </head>
         <Stylesheet id="font" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" />
         <Stylesheet id="icons" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <Stylesheet id="leptos" href="/pkg/catenarytulip.css"/>
         <Link rel="shortcut icon" href="/favicon.svg"/>
-        <Router>
-            <Routes>
-                <Route path="/" view=move || view! { <Home /> }/>
-                <Route path="/realtimekeys" view=move || view! { <RealtimeKeys /> }/>
-                <Route path="/help" view=move || view! { <Help /> }/>
-                <Route path="/404.html" view=move || view! { <NotFound /> }/>
+        <Router  >
+            <Routes fallback=|| "Not found.">
+                <Route path=path!("/") view=move || view! { <Home /> }/>
+                <Route path=path!("/realtimekeys") view=move || view! { <RealtimeKeys /> }/>
+                <Route path=path!("/help") view=move || view! { <Help /> }/>
+                <Route path=path!("/404.html") view=move || view! { <NotFound /> }/>
             </Routes>
         </Router>
     }
@@ -238,32 +247,32 @@ async fn submit_data(
 
 #[component]
 fn RealtimeKeys() -> impl IntoView {
-    let (master_email, set_master_email) = create_signal(String::from(""));
-    let (master_password, set_master_password) = create_signal(String::from(""));
-    let (master_creds, set_master_creds) = create_signal((String::from(""), String::from("")));
+    let (master_email, set_master_email) = signal(String::from(""));
+    let (master_password, set_master_password) = signal(String::from(""));
+    let (master_creds, set_master_creds) = signal((String::from(""), String::from("")));
 
-    let (form_feed_id, set_form_feed_id) = create_signal(String::from(""));
-    let (form_password, set_form_password) = create_signal(String::from(""));
-    let (form_interval_ms, set_form_interval_ms) = create_signal(String::from(""));
+    let (form_feed_id, set_form_feed_id) = signal(String::from(""));
+    let (form_password, set_form_password) = signal(String::from(""));
+    let (form_interval_ms, set_form_interval_ms) = signal(String::from(""));
 
-    let original_keys = create_rw_signal::<BTreeMap<String, EachPasswordRow>>(BTreeMap::new());
+    let original_keys : RwSignal<BTreeMap<String, EachPasswordRow>> = RwSignal::new(BTreeMap::new());
 
-    let (authorised, set_authorised) = create_signal(false);
+    let (authorised, set_authorised) = signal(false);
 
-    let (count, set_count) = create_signal(0);
+    let (count, set_count) = signal(0);
 
-    let async_data_load = create_resource(
+    let async_data_load = Resource::new(
         move || (master_email.get(), master_password.get(), count.get()),
         |(master_email, master_password, _)| async move {
             load_realtime_keys(master_email.clone(), master_password.clone()).await
         },
     );
 
-    let feed_id_node_ref: NodeRef<html::Input> = create_node_ref();
-    let password_node_ref: NodeRef<html::Textarea> = create_node_ref();
-    let interval_ms_node_ref: NodeRef<html::Input> = create_node_ref();
+    let feed_id_node_ref: NodeRef<html::Input> = NodeRef::new();
+    let password_node_ref: NodeRef<html::Textarea> = NodeRef::new();
+    let interval_ms_node_ref: NodeRef<html::Input> = NodeRef::new();
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         async_data_load.and_then(|data| {
             leptos::logging::log!("{:?}", data);
             if let Some(data) = data {
@@ -353,7 +362,7 @@ fn RealtimeKeys() -> impl IntoView {
                                                 </p>
                                             }).collect_view()
                                         }
-                                       
+
                                         <p class="font-semibold">"Passwords:"</p>
                                         <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-scroll h-[300px]"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
                                             ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
@@ -438,10 +447,15 @@ fn RealtimeKeys() -> impl IntoView {
             {
                 move || match original_keys.get().get(form_feed_id.get().as_str()) {
                     Some(_) => view! {
-                        <p>"✅ Feed ID is valid"</p>
+
+                        <p>{String::from("✅ Feed ID is valid")}</p>
+
                     },
                     None => view! {
-                        <p>"❌ Feed ID is invalid"</p>
+
+                            <p>{String::from("❌ Feed ID is invalid")}</p>
+
+
                     }
                 }
             }
@@ -463,18 +477,18 @@ fn RealtimeKeys() -> impl IntoView {
              {
                 move || match ron::from_str::<Option<u32>>(form_interval_ms.get().as_str()) {
                     Ok(_) => view! {
-                        <p>"✅ Interval is valid"</p>
-                    },
+                        <p>String::from("✅ Interval is valid")</p>
+                    }.into_any(),
                     Err(_) => view! {
-                        <p>"❌ Interval is invalid, must be Option<u32> like Some(1000) or None"</p>
-                }
+                        <p>String::from("❌ Interval is invalid, must be Option<u32> like Some(1000) or None")</p>
+                }.into_any()
             }
              }
 
             <p>"password"</p>
 
             <textarea
-                type="text"
+                
                 prop:value=move || form_password.get()
                 disabled=move || !authorised.get()
                 class= "w-full bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-base h-[400px]"
@@ -496,26 +510,26 @@ fn RealtimeKeys() -> impl IntoView {
 
                                 match all_same {
                                     true => view! {
-                                        <> <p>"✅ Password is valid"</p></>
-                                    },
+                                     <p>"✅ Password is valid"</p>
+                                    }.into_any(),
                                     false => view! {
-                                        <> <p>"❌ Password is invalid, must be the same length as key format"</p></>
-                                    }
+                                        <p>"❌ Password is invalid, must be the same length as key format"</p>
+                                    }.into_any()
                                 }
                             },
                             None => {
                                 view! {
                                     <><p>"✅ Password is valid"</p></>
-                                }
+                                }.into_any()
                             }
                         }
                     },
                     Err(err) => view! {
-                        <>
+                    
                         <p>"❌ Password is invalid"</p>
                         <p class="font-mono">{format!("{:#?}", err)}</p>
-                        </>
-                }
+                        
+                }.into_any()
             }
             }
 
@@ -535,13 +549,13 @@ fn RealtimeKeys() -> impl IntoView {
               });
             }
                 >"Submit"</button>
-                        }
+                        }.into_any()
                     } else {
                         view! {
-                            <>
+                            
                             <p>"Not authorised"</p>
-                            </>
-                        }
+                            
+                        }.into_any()
                     }
                 }
         </main>

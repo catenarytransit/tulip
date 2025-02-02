@@ -4,7 +4,8 @@ pub mod app;
 #[wasm_bindgen::prelude::wasm_bindgen]
 pub fn hydrate() {
     use crate::app::App;
-    use leptos::{logging, mount_to_body};
+    use leptos::{logging};
+    use leptos::mount::mount_to_body;
     let _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
 
@@ -17,7 +18,8 @@ pub fn hydrate() {
 #[wasm_bindgen::prelude::wasm_bindgen(start)]
 pub fn main() {
     use crate::app::App;
-    use leptos::{logging, mount_to_body};
+    use leptos::{logging};
+    use leptos::mount::mount_to_body;
     _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
 

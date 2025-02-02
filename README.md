@@ -70,3 +70,7 @@ Although it is not recommended, you can also run your project without server int
 `trunk serve --open --features csr`
 
 This may be useful for integrating external tools which require a static site, e.g. `tauri`.
+
+## Common Error Debugging
+
+If compilation complains about bad wasm bindgen version, run `cargo install cargo-leptos`

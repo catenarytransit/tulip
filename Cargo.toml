@@ -1,7 +1,7 @@
 [package]
 name = "tulip"
-version = "0.1.0"
-edition = "2021"
+version = "0.2.0"
+edition = "2024"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -11,21 +11,20 @@ actix-files = { version = "0.6", optional = true }
 actix-web = { version = "4", optional = true, features = ["macros"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 http = { version = "1", optional = true }
-leptos = { version = "0.6", features = ["nightly"] }
-leptos_meta = { version = "0.6", features = ["nightly"] }
-leptos_actix = { version = "0.6", optional = true }
-leptos_router = { version = "0.6", features = ["nightly"] }
-fluent-templates = "0.10.1"
-leptos-fluent = {version = "0.1.21"}
+leptos = { version = "0.7.5", features = ["nightly"] }
+leptos_meta = { version = "0.7.5"}
+leptos_actix = { version = "0.7.5", optional = true }
+leptos_router = { version = "0.7.5", features = ["nightly"] }
+fluent-templates = "0.13"
+leptos-fluent = {version = "0.2.3"}
 wasm-bindgen = "0.2.93"
 web-sys = { version = "0.3.69", features = ["Storage", "Navigator"] }
 unic-langid = "0.9.4"
-leptos_i18n = "0.4.0"
+leptos_i18n = "0.5.5"
 futures = "0.3.30"
 qstring = "0.7.2"
 reqwest = "0.12.1"
 fasthash = "0.4.0"
-rand = "0.8.5"
 chrono = "0.4.37"
 chrono-tz = "0.10.0"
 wasm-bindgen-futures = "0.4.43"
@@ -42,12 +41,10 @@ ron = "0.8.1"
 actix_block_ai_crawling = {version = "0.2.8", optional = true}
 
 [features]
-csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
+csr = ["leptos/csr"]
 hydrate = [
   "dep:console_error_panic_hook",
   "leptos/hydrate",
-  "leptos_meta/hydrate",
-  "leptos_router/hydrate",
     "leptos_i18n/hydrate",
 ]
 ssr = [
