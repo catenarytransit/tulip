@@ -252,13 +252,10 @@ async fn submit_data(
     }
 }
 
+
 fn RealtimeKeys() -> impl IntoView {
-    
-    use reactive_graph::graph::Subscriber;
     let (master_email, set_master_email) = signal(String::from(""));
     let (master_password, set_master_password) = signal(String::from(""));
-    let (master_creds, set_master_creds) = signal((String::from(""), String::from("")));
-
     let (form_feed_id, set_form_feed_id) = signal(String::from(""));
     let (form_password, set_form_password) = signal(String::from(""));
     let (form_interval_ms, set_form_interval_ms) = signal(String::from(""));
@@ -272,37 +269,62 @@ fn RealtimeKeys() -> impl IntoView {
     let async_data_load = ArcLocalResource::new(move || {
         let master_email = master_email.get().clone();
         let master_password = master_password.get().clone();
+        let count = count.get();
+
+        
+            leptos_dom::log!("Count {}", count);
+        
+
+        leptos_dom::log!("Creds {} {}", master_email, master_password);
+        leptos_dom::log!("Try loading passwords");
 
         async {
             let fetch =
                 load_realtime_keys(master_email, master_password).await;
+
+                leptos_dom::log!("fetch {:#?}", fetch);
     
             match fetch {
                 Ok(data) => data,
-                Err(err) => None,
+                Err(err) => {
+                    leptos_dom::log!("Error {:#?}", err);
+                    None
+                },
             }
         }
     });
-
-    async_data_load.add_source(count.to_any_source());
-    async_data_load.add_source(master_email.to_any_source());
-    async_data_load.add_source(master_password.to_any_source());
 
     let feed_id_node_ref: NodeRef<html::Input> = NodeRef::new();
     let password_node_ref: NodeRef<html::Textarea> = NodeRef::new();
     let interval_ms_node_ref: NodeRef<html::Input> = NodeRef::new();
 
+    let async_part_left = (&async_data_load).clone();
+
     Effect::new(move || {
-        let data = async_data_load.read();
+        let count = count.get();
+        async_part_left.refetch();
+    });
 
-        if let Some(data) = &*data {
-            let data = data.deref();
+    let async_part_right = (&async_data_load).clone();
 
-            if let Some(data) = data {
-                original_keys.update(|x| *x = data.passwords.clone());
-                set_authorised(true);
+    Effect::new( move || {
+        let data = async_part_right.try_read();
+
+        if let Some(data) = data {
+            log!("GOT THE GUARD");
+            if let Some(data) = &*data {
+                let data = data.deref();
+    
+                if let Some(data) = data {
+                    original_keys.update(|x| *x = data.passwords.clone());
+                    set_authorised(true);
+                }
             }
+        } else {
+            println!("Could not access guard");
         }
+
+        
     });
 
     view! {
@@ -311,6 +333,7 @@ fn RealtimeKeys() -> impl IntoView {
             <h1 class="text-2xl font-bold text-tulip">"Realtime Key Manager"</h1>
             <p>"Please confirm your Tulip login credentials, as key information is sensitive and confidential."</p>
 
+            <form  onsubmit="return false;">
             <input
                 type="email"
                 placeholder="Email"
@@ -318,17 +341,19 @@ fn RealtimeKeys() -> impl IntoView {
                 class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold mr-4"
                 on:input=move |event| {
                     set_master_email(event_target_value(&event));
-                    set_master_creds((event_target_value(&event), master_password.get()));
+                    set_count(count.get() + 1);
                 }
             />
             <input
                 type="password"
+                autocomplete="current-password"
                 placeholder="Password"
                 prop:value=move || master_password.get()
                 class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 on:input=move |event| {
+                    leptos::logging::log!("Password input");
                     set_master_password(event_target_value(&event));
-                    set_master_creds((master_email.get(), event_target_value(&event)));
+                    set_count(count.get() + 1);
                 }
             />
 
@@ -336,9 +361,13 @@ fn RealtimeKeys() -> impl IntoView {
             <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
             on:input=move |event| {
                 //async_data_load.refetch();
+                leptos::logging::log!("LOAD button pressed");
                 set_count(count.get() + 1);
             }
             >"Load"</button>
+            </form>
+
+            <p>"COUNT" {count}</p>
 
             <br/>
                 {
@@ -350,7 +379,7 @@ fn RealtimeKeys() -> impl IntoView {
                     //reload button
                     <button
                     on:click=move |e| {
-                        // async_data_load.refetch();
+                        leptos_dom::log!("RELOAD button pressed");
                         set_count(count.get() + 1);
                     }
                     class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
@@ -563,6 +592,8 @@ fn RealtimeKeys() -> impl IntoView {
                 //async_data_load.refetch();
               });
             }
+
+            
                 >"Submit"</button>
                         }.into_any()
                     } else {
