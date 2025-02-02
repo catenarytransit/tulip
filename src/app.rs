@@ -327,7 +327,9 @@ fn RealtimeKeys() -> impl IntoView {
 
             <br/>
             <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
-            on:input=move |event| set_count.update(|count| *count += 1)
+            on:input=move |event| {
+                async_data_load.refetch();
+            }
             >"Load"</button>
 
             <br/>
