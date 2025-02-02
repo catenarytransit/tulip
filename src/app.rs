@@ -551,13 +551,14 @@ fn RealtimeKeys() -> impl IntoView {
                 class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
             on:click=move |e| {
-              let master_creds = master_creds.get();
+              let master_email = master_email.get();
+                let master_password = master_password.get();
               let (form_feed_id, form_password, form_interval_ms) = (form_feed_id.get(),
               form_password.get(),
               form_interval_ms.get());
 
               spawn_local(async move {
-                submit_data(master_creds.0, master_creds.1, form_feed_id, form_password, form_interval_ms).await;
+                submit_data(master_email, master_password, form_feed_id, form_password, form_interval_ms).await;
                 set_count(count.get() + 1);
                 //async_data_load.refetch();
               });
