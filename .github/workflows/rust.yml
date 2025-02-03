@@ -16,5 +16,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Install Dependencies
       run: sudo apt install protobuf-compiler redis
+    - name: Add Cargo Leptos
+      run: cargo install cargo-leptos
     - name: Build
-      run: cargo build --verbose
+      run: cargo leptos build --release --verbose
