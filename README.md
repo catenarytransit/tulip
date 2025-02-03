@@ -11,23 +11,11 @@ This is a powerful tool to manage and diagnose the vast complexity that exists o
 
 This is a template for use with the [Leptos](https://github.com/leptos-rs/leptos) web framework and the [cargo-leptos](https://github.com/akesson/cargo-leptos) tool.
 
-## Creating your template repo
+## CLI
 
 If you don't have `cargo-leptos` installed you can install it with
 
 `cargo install cargo-leptos`
-
-Then run
-
-`cargo leptos new --git leptos-rs/start`
-
-to generate a new project template (you will be prompted to enter a project name).
-
-`cd {projectname}`
-
-to go to your newly created project.
-
-Of course, you should explore around the project structure, but the best place to start with your application code is in `src/app.rs`.
 
 ## Running your project
 
