@@ -31,7 +31,6 @@ async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
         .body(robots_banned_bots)
 }
 
-#[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     use actix_files::Files;
@@ -39,6 +38,7 @@ async fn main() -> std::io::Result<()> {
     use leptos::prelude::get_configuration;
     use leptos::*;
     use leptos_actix::{LeptosRoutes, generate_route_list};
+    use leptos_meta::MetaTags;
     use tulip::app::*;
     // Setting this to None means we'll be using cargo-leptos and its env vars.
     let conf = get_configuration(None).unwrap();
@@ -54,9 +54,30 @@ async fn main() -> std::io::Result<()> {
         let leptos_options = &conf.leptos_options;
         let site_root = &leptos_options.site_root;
         let routes = &routes;
-        App::new()
+        actix_web::App::new()
             .wrap(actix_block_ai_crawling::BlockAi)
-            .leptos_routes(routes.to_owned(), App)
+            .leptos_routes(routes.to_owned(),
+            {let leptos_options = leptos_options.clone();
+                 move || {
+                use leptos::prelude::*;
+                use leptos_meta::*;
+
+                view! {
+                    <!DOCTYPE html>
+                    <html lang="en">
+                        <head>
+                            <meta charset="utf-8" />
+                            <meta name="viewport" content="width=device-width, initial-scale=1" />
+                            <AutoReload options=leptos_options.clone() />
+                            <HydrationScripts options=leptos_options.clone()/>
+                            <MetaTags/>
+                        </head>
+                        <body><App />
+                        </body>
+                        </html>
+                }
+            }
+            })
             .route("robots.txt", web::get().to(robots))
             .service(Files::new("/", site_root.to_string()))
             .wrap(middleware::Compress::default())
@@ -64,26 +85,4 @@ async fn main() -> std::io::Result<()> {
     .bind(&addr)?
     .run()
     .await
-}
-
-#[cfg(not(any(feature = "ssr", feature = "csr")))]
-pub fn main() {
-    // no client-side main function
-    // unless we want this to work with e.g., Trunk for pure client-side testing
-    // see lib.rs for hydration function instead
-    // see optional feature `csr` instead
-}
-
-#[cfg(all(not(feature = "ssr"), feature = "csr"))]
-pub fn main() {
-    // a client-side main function is required for using `trunk serve`
-    // prefer using `cargo leptos serve` instead
-    // to run: `trunk serve --open --features csr`
-    use kylerchinmusic::app::*;
-    use leptos::*;
-    use wasm_bindgen::prelude::wasm_bindgen;
-
-    console_error_panic_hook::set_once();
-
-    leptos::mount_to_body(App);
 }

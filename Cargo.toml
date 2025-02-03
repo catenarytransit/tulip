@@ -11,13 +11,12 @@ actix-files = { version = "0.6", optional = true }
 actix-web = { version = "4", optional = true, features = ["macros"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 http = { version = "1", optional = true }
-leptos = { version = "0.7.5", features = ["nightly"] }
-leptos_meta = { version = "0.7.5"}
+leptos = { version = "0.7.5"}
 leptos_actix = { version = "0.7.5", optional = true }
-leptos_router = { version = "0.7.5", features = ["nightly"] }
+leptos_router = { version = "0.7.5"}
 fluent-templates = "0.13"
 leptos-fluent = {version = "0.2.3"}
-wasm-bindgen = "0.2.93"
+wasm-bindgen = {version = "0.2.93", optional = true }
 web-sys = { version = "0.3.69", features = ["Storage", "Navigator"] }
 unic-langid = "0.9.4"
 leptos_i18n = "0.5.5"
@@ -40,13 +39,20 @@ argon2 = "0.5.3"
 ron = "0.8.1"
 actix_block_ai_crawling = {version = "0.2.8", optional = true}
 reactive_graph = "0.1.5"
+leptos_meta = { version = "0.7.5"}
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 'z'
 
 [features]
-csr = ["leptos/csr"]
 hydrate = [
   "dep:console_error_panic_hook",
   "leptos/hydrate",
     "leptos_i18n/hydrate",
+    "dep:wasm-bindgen",
+    
 ]
 ssr = [
   "dep:actix-files",
@@ -57,6 +63,7 @@ ssr = [
   "leptos_router/ssr",
   "leptos_i18n/actix",
   "dep:actix_block_ai_crawling"
+  
 ]
 
 [package.metadata.cargo-all-features]
@@ -76,7 +83,7 @@ inherits = "release"
 opt-level = 'z'
 lto = true
 codegen-units = 1
-panic = "abort"
+panic = "unwind"
 
 [package.metadata.leptos]
 not_found_path = "/404.html"
@@ -132,7 +139,7 @@ lib-default-features = false
 # The profile to use for the lib target when compiling for release
 #
 # Optional. Defaults to "release".
-lib-profile-release = "wasm-release"
+#lib-profile-release = "wasm-release"
 
 # Optional, Activates the tailwind build
 tailwind-input-file = "style/tailwind.css"
