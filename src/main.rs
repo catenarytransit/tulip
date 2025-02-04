@@ -79,6 +79,7 @@ async fn main() -> std::io::Result<()> {
             }
             })
             .route("robots.txt", web::get().to(robots))
+            .route("/api/{tail:.*}", leptos_actix::handle_server_fns())
             .service(Files::new("/", site_root.to_string()))
             .wrap(middleware::Compress::default())
     })

@@ -202,8 +202,8 @@ pub struct KeyResponse {
     pub passwords: BTreeMap<String, EachPasswordRow>,
 }
 
-#[server]
-async fn load_realtime_keys(
+#[server(endpoint = "load_realtime_keys")]
+pub async fn load_realtime_keys(
     master_email: String,
     master_password: String,
 ) -> Result<Option<KeyResponse>, ServerFnError> {
