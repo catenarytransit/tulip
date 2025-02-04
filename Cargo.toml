@@ -41,11 +41,6 @@ actix_block_ai_crawling = {version = "0.2.8", optional = true}
 reactive_graph = "0.1.5"
 leptos_meta = { version = "0.7.5"}
 
-[profile.release]
-codegen-units = 1
-lto = true
-opt-level = 'z'
-
 [features]
 hydrate = [
   "dep:console_error_panic_hook",
@@ -76,14 +71,6 @@ denylist = [
 	"leptos_axum",
 ]
 skip_feature_sets = [["csr", "ssr"], ["csr", "hydrate"], ["ssr", "hydrate"]]
-
-# Defines a size-optimized profile for the WASM bundle in release mode
-[profile.wasm-release]
-inherits = "release"
-opt-level = 'z'
-lto = true
-codegen-units = 1
-panic = "unwind"
 
 [package.metadata.leptos]
 not_found_path = "/404.html"
