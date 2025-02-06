@@ -241,7 +241,7 @@ pub async fn load_realtime_keys(
         }
         _ => {
             println!("Error, {}", response.status());
-            Err(ServerFnError::new(format!("Error, {}, \n{}", response.status(), response.text().await?)))
+            Err(ServerFnError::new(format!("Error, {}, \n{}", response.status(), response.text().await.unwrap())))
         }
     }
 }
