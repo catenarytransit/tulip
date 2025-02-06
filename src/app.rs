@@ -397,9 +397,13 @@ fn RealtimeKeys() -> impl IntoView {
         leptos_dom::log!("Count {}", count);
 
         leptos_dom::log!("Creds {} {}", master_email, master_password);
-        leptos_dom::log!("Try loading passwords");
+        
 
         async {
+            if master_email.is_empty() || master_password.is_empty() {
+                return None;
+            }
+            leptos_dom::log!("Try loading passwords");
             let fetch = load_realtime_keys(master_email, master_password).await;
 
             leptos_dom::log!("fetch {:#?}", fetch);
