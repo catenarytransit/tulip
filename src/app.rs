@@ -209,14 +209,17 @@ pub async fn load_realtime_keys(
 ) -> Result<Option<KeyResponse>, ServerFnError> {
     let client = reqwest::Client::new();
 
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert("Content-Type", "application/x-www-form-urlencoded".parse()?);
+
+    let mut params = std::collections::HashMap::new();
+    params.insert("email", master_email.as_str());
+    params.insert("password", master_password.as_str());
+
     let response = client
         .post("https://birch.catenarymaps.org/getrealtimekeys")
-        .form(
-            &[
-                ("email", master_email.as_str()),
-                ("password", master_password.as_str()),
-            ],
-        )
+        .headers(headers)
+        .form(&params)
         .send()
         .await?;
 
