@@ -58,7 +58,6 @@ ssr = [
   "leptos_router/ssr",
   "leptos_i18n/actix",
   "dep:actix_block_ai_crawling"
-  
 ]
 
 [package.metadata.cargo-all-features]

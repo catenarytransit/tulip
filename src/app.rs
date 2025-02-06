@@ -210,9 +210,13 @@ pub async fn load_realtime_keys(
     let client = reqwest::Client::new();
 
     let response = client
-        .get("https://birch.catenarymaps.org/getrealtimekeys/")
-        .header("email", master_email)
-        .header("password", master_password)
+        .post("https://birch.catenarymaps.org/getrealtimekeys/")
+        .form(
+            &[
+                ("email", master_email.as_str()),
+                ("password", master_password.as_str()),
+            ],
+        )
         .send()
         .await?;
 
