@@ -216,6 +216,8 @@ pub async fn load_realtime_keys(
     params.insert("email", master_email.as_str());
     params.insert("password", master_password.as_str());
 
+    println!("Sending to Birch, {}, {}", master_email, master_password);
+
     let response = client
         .post("https://birch.catenarymaps.org/getrealtimekeys")
         .headers(headers)
