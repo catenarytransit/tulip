@@ -236,7 +236,7 @@ pub async fn load_realtime_keys(
         }
         _ => {
             println!("Error, {}", response.status());
-            Err(ServerFnError::new("Data did not load correctly"))
+            Err(ServerFnError::new("Data did not load correctly, error code {}", response.status()))
         }
     }
 }
