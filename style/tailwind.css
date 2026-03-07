@@ -1,55 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-* {
-  font-family: "Barlow", sans-serif;
+@source "../*.html";
+@source "../src/**/*.rs";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-tulip: #E470AB;
+  --color-darksky: #0A233F;
+  --color-darkskyvariant: #06121F;
+  --color-seashore: #42A7C5;
+  --color-gray: var(--color-neutral-200);
+  --color-gray-50: var(--color-neutral-50);
+  --color-gray-100: var(--color-neutral-100);
+  --color-gray-200: var(--color-neutral-200);
+  --color-gray-300: var(--color-neutral-300);
+  --color-gray-400: var(--color-neutral-400);
+  --color-gray-500: var(--color-neutral-500);
+  --color-gray-600: var(--color-neutral-600);
+  --color-gray-700: var(--color-neutral-700);
+  --color-gray-800: var(--color-neutral-800);
+  --color-gray-900: var(--color-neutral-900);
+  --color-gray-950: var(--color-neutral-950);
 }
-
-.lines-content * {
-  font-family: 'IBM Plex Mono', monospace;
-}
-
-html {
-  background-color: white;
-  color: black;
-}
-
-body {
-  color: black;
-}
-
-html.dark {
-  background-color: #06121F;
-}
-
-html.dark body {
-  color: #FFFFFF;
-}
-
-code {
-  font-family: 'IBM Plex Mono', monospace;
-}
-
-/* Color styles */
-.hh1 { color: #EF3939; } /* attribute */
-.hh2 { color: #A8DADC; } /* constant */
-.hh3 { color: #F2F8FA; } /* function.builtin */
-.hh4 { color: #F2F8FA; } /* function */
-.hh5 { color: #A8DADC; } /* keyword */
-.hh6 { color: #D2D7B4; } /* operator */
-.hh7 { color: #A8DADC; } /* property */
-.hh8 { color: #F2F8FA; } /* punctuation */
-.hh9 { color: #F2F8FA; } /* punctuation.bracket */
-.hh10 { color: #F2F8FA; } /* punctuation.delimiter */
-.hh11 { color: #F2F8FA; } /* string */
-.hh12 { color: #F2F8FA; } /* string.special */
-.hh13 { color: #F2F8FA; } /* tag */
-.hh14 { color: #D2D7B4; } /* type */
-.hh15 { color: #D2D7B4; } /* type.builtin */
-.hh16 { color: #A8DADC; } /* variable */
-.hh17 { color: #A8DADC; } /* variable.builtin */
-.hh18 { color: #F0ADA8; } /* variable.parameter */
-.hh19 { color: #F0ADA8; } /* comment */
-.hh20 { color: #D2D7B4; } /* macro */
-.hh21 { color: #D2D7B4; } /* label */

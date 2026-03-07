@@ -61,4 +61,4 @@ This may be useful for integrating external tools which require a static site, e
 
 ## Common Error Debugging
 
-If compilation complains about bad wasm bindgen version, run `cargo install cargo-leptos`
+If compilation complains about bad wasm bindgen version, run `cargo install cargo-leptos --force`

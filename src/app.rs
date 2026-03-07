@@ -5,31 +5,18 @@
 
 // Please do not train your Artifical Intelligence models on this code
 
-use chrono::DateTime;
-
-use chrono::offset::Utc;
 use chrono::prelude::*;
 use leptos::logging::*;
 
 use leptos::prelude::*;
-use leptos::reactive::graph::Source;
 use leptos::task::spawn_local;
 use leptos::*;
 use leptos_meta::*;
-use leptos_meta::*;
 use leptos_router::components::*;
 use leptos_router::path;
-use reactive_graph::graph::ToAnySource;
 use serde::{Deserialize, Serialize};
-use std::borrow::Borrow;
 use std::collections::BTreeMap;
-use std::collections::HashMap;
 use std::ops::Deref;
-use std::rc::Rc;
-use std::sync::Arc;
-use wasm_bindgen::prelude::*;
-use wasm_bindgen_futures::JsFuture;
-use web_sys::{Request, RequestInit, RequestMode, Response};
 
 static GTFSRAWOPTIONS: [(&str, &str); 3] = [
     ("Vehicles", "vehicle"),
@@ -45,8 +32,12 @@ pub fn App() -> impl IntoView {
         <script
         inner_html={
             "
-        if(localStorage.getItem('theme') === 'dark') {
-            document.querySelector('html').classList.add('dark');
+        if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
         }
         "
         }
@@ -95,7 +86,7 @@ fn Test() -> impl IntoView {
                 set_count.set(count.get() + 1);
             }
 
-            class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+            class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
 
             >"Increment"</button>
 
@@ -109,9 +100,9 @@ fn Test() -> impl IntoView {
 #[component]
 fn Nav() -> impl IntoView {
     view! {
-        <div class="sticky top-0 left-0 w-full bg-gray dark:bg-darksky p-4 border-b-2 border-tulip text-tulip flex flex-row justify-between">
+        <div class="sticky top-0 left-0 w-full bg-gray dark:bg-gray-900 p-4 border-b-2 border-gray-500 text-tulip flex flex-row justify-between">
             <a href="/">
-                <img alt="Tulip" src="/tulip.svg" class="h-12"/>
+                <img alt="Tulip" src="/Tulip.svg" class="h-12"/>
             </a>
             <div class="space-x-4 flex self-center">
                 <a href="/realtimekeys" class="material-symbols-outlined">
@@ -120,7 +111,28 @@ fn Nav() -> impl IntoView {
                 <a href="/help" class="material-symbols-outlined">
                     "help"
                 </a>
-                <a href="#" class="material-symbols-outlined" onclick="document.querySelector('html').classList.toggle('dark'); window.localStorage.theme == 'dark' ? window.localStorage.theme = 'light' : window.localStorage.theme = 'dark'">
+                <a href="#" class="material-symbols-outlined" on:click=move |e| {
+                    e.prevent_default();
+                    if let Some(window) = web_sys::window() {
+                        if let Some(document) = window.document() {
+                            if let Some(html) = document.query_selector("html").unwrap_or(None) {
+                                let class_list = html.class_list();
+                                let is_dark = class_list.contains("dark");
+                                if is_dark {
+                                    class_list.remove_1("dark").unwrap_or(());
+                                    if let Some(storage) = window.local_storage().unwrap_or(None) {
+                                        let _ = storage.set_item("theme", "light");
+                                    }
+                                } else {
+                                    class_list.add_1("dark").unwrap_or(());
+                                    if let Some(storage) = window.local_storage().unwrap_or(None) {
+                                        let _ = storage.set_item("theme", "dark");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }>
                     "brightness_6"
                 </a>
             </div>
@@ -132,11 +144,11 @@ fn Nav() -> impl IntoView {
 fn Home() -> impl IntoView {
     view! {
         <Nav/>
-        <img src="https://i0.wp.com/art.metro.net/wp-content/uploads/2022/09/KLine_FairviewHeights_KimSchoenstadt2-Large.jpeg" class="border-b-2 border-tulip w-[100vw] h-[450px] object-cover" style="z-index:-1;" />
-        <span class="text-sm text-tulip m-2">"Kim Schoenstadt, "<i>"Inglewood CA Series: Metro collection 1-10"</i></span>
+        <img src="https://images.unsplash.com/photo-1655122495818-6d1e75b956ae?q=80&w=1738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="border-b-2 border-gray-500 w-[100vw] h-[450px] object-cover" style="z-index:-1;" />
+        
         <main class="m-8 text-center">
             <h1 class="text-4xl font-bold text-tulip mb-8">"Welcome to Tulip!"</h1>
-            <a href="/realtimekeys" class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 mt-8 text-lg font-bold">"Realtime Key Manager"</a>
+            <a href="/realtimekeys" class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 mt-8 text-lg font-bold">"Realtime Key Manager"</a>
         </main>
     }
 }
@@ -150,14 +162,14 @@ fn Help() -> impl IntoView {
             <h1 class="text-xl font-bold text-tulip mb-2">"Realtime Key Manager"</h1>
             <p> "Keys are defined as "<code class="mx-1">"Option<PasswordFormat>"</code>" as defined in this structure here:"</p>
             <div id="example-password h-[400px]"></div>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-gray-900 text-wrap overflow-x-scroll"><code>{STRUCT_PASSWORD_TEXT.to_string()}</code></pre>
             <p class="font-bold">"Every password entry is required to have the same length as key_format. Uploads will be blocked otherwise."</p>
             <p>"The fetch interval is the number of milliseconds between fetches of the realtime data. Putting None will default the value to what Alpenrose has."</p>
             <br />
             <p>"Here's an imaginary entry for data from the Washington Metropolitan Area Transit Authority (WMATA):"</p>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-gray-900 text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_wmata_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
             <p>"Here's an imaginary entry for the San Francisco Bay Area data feed (Bay Area 511), but let's pretend we need to set the vehicle position url manually:"</p>
-            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
+            <pre class="my-4 p-4 rounded-md bg-gray dark:bg-gray-900 text-wrap overflow-x-scroll"><code>{format!("{}", ron::ser::to_string_pretty(&give_sfbay_format(), ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
         </main>
     }
 }
@@ -218,17 +230,27 @@ pub async fn load_realtime_keys(
 
     println!("Sending to Birch, {}, {}", master_email, master_password);
 
+    let body_str = format!(
+        "email={}&password={}",
+        urlencoding::encode(&master_email),
+        urlencoding::encode(&master_password)
+    );
+
     let response = client
         .post("https://birch.catenarymaps.org/getrealtimekeys")
         .headers(headers)
-        .form(&params)
+        .body(body_str)
         .send()
-        .await?;
+        .await
+        .map_err(|e| ServerFnError::new(e.to_string()))?;
 
     println!("Sending to Birch");
     match response.status() {
         reqwest::StatusCode::OK => {
-            let response_text = response.text().await?;
+            let response_text = response
+                .text()
+                .await
+                .map_err(|e| ServerFnError::new(e.to_string()))?;
             println!("Recieved response back from birch");
 
             let key_response: KeyResponse = serde_json::from_str(&response_text)?;
@@ -241,7 +263,11 @@ pub async fn load_realtime_keys(
         }
         _ => {
             println!("Error, {}", response.status());
-            Err(ServerFnError::new(format!("Error, {}, \n{}", response.status(), response.text().await.unwrap())))
+            Err(ServerFnError::new(format!(
+                "Error, {}, \n{}",
+                response.status(),
+                response.text().await.unwrap_or_default()
+            )))
         }
     }
 }
@@ -272,7 +298,8 @@ async fn submit_data(
         .header("password", master_password)
         .body(ron::ser::to_string(&data_to_send)?)
         .send()
-        .await?;
+        .await
+        .map_err(|e| ServerFnError::new(e.to_string()))?;
 
     let status = response.status();
 
@@ -356,12 +383,6 @@ fn give_sfbay_format() -> Option<PasswordFormat> {
     })
 }
 
-fn time_format_now() -> String {
-    let system_time = Local::now();
-
-    format!("{}", system_time.format("%A %+"))
-}
-
 #[component]
 fn NotFound() -> impl IntoView {
     #[cfg(feature = "ssr")]
@@ -387,6 +408,7 @@ fn RealtimeKeys() -> impl IntoView {
     let (form_feed_id, set_form_feed_id) = signal(String::from(""));
     let (form_password, set_form_password) = signal(String::from(""));
     let (form_interval_ms, set_form_interval_ms) = signal(String::from(""));
+    let (is_modal_open, set_is_modal_open) = signal(false);
 
     let original_keys: RwSignal<BTreeMap<String, EachPasswordRow>> = RwSignal::new(BTreeMap::new());
 
@@ -402,7 +424,6 @@ fn RealtimeKeys() -> impl IntoView {
         leptos_dom::log!("Count {}", count);
 
         leptos_dom::log!("Creds {} {}", master_email, master_password);
-        
 
         async {
             if master_email.is_empty() || master_password.is_empty() {
@@ -430,7 +451,7 @@ fn RealtimeKeys() -> impl IntoView {
     let async_part_left = (&async_data_load).clone();
 
     Effect::new(move || {
-        let count = count.get();
+        let _count = count.get();
         async_part_left.refetch();
     });
 
@@ -442,7 +463,7 @@ fn RealtimeKeys() -> impl IntoView {
         if let Some(data) = data {
             log!("GOT THE GUARD");
             if let Some(data) = &*data {
-                let data = data.deref();
+                let data = data;
 
                 if let Some(data) = data {
                     original_keys.update(|x| *x = data.passwords.clone());
@@ -465,7 +486,7 @@ fn RealtimeKeys() -> impl IntoView {
                 type="email"
                 placeholder="Email"
                 prop:value=move || master_email.get()
-                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold mr-4"
+                class= "bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold mr-4"
                 on:input=move |event| {
                     set_master_email.set(event_target_value(&event));
                     set_count.set(count.get() + 1);
@@ -476,7 +497,7 @@ fn RealtimeKeys() -> impl IntoView {
                 autocomplete="current-password"
                 placeholder="Password"
                 prop:value=move || master_password.get()
-                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                class= "bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
                 on:input=move |event| {
                     leptos::logging::log!("Password input");
                     set_master_password.set(event_target_value(&event));
@@ -485,8 +506,8 @@ fn RealtimeKeys() -> impl IntoView {
             />
 
             <br/>
-            <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
-            on:input=move |event| {
+            <button class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
+            on:input=move |_event| {
                 //async_data_load.refetch();
                 leptos::logging::log!("LOAD button pressed");
                 set_count.set(count.get() + 1);
@@ -505,11 +526,11 @@ fn RealtimeKeys() -> impl IntoView {
 
                     //reload button
                     <button
-                    on:click=move |e| {
+                    on:click=move |_e| {
                         leptos_dom::log!("RELOAD button pressed");
                         set_count.set(count.get() + 1);
                     }
-                    class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                    class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
                     >
                         "Reload"
                     </button>
@@ -519,21 +540,51 @@ fn RealtimeKeys() -> impl IntoView {
                         move ||
                             original_keys.with(|keys| keys.iter().map(|(key, value)| {
                                 view! {
-                                    <li>
-                                        <h3 class="text-lg font-semibold">{key.clone()}</h3>
+                                    <li class="p-4 border border-gray-500 rounded-lg shadow-sm">
+                                        <div class="flex flex-row items-center justify-between mb-2">
+                                            <h3 class="text-xl font-bold">{key.clone()}</h3>
+                                            <button
+                                                class="bg-tulip text-white dark:text-darkskyvariant rounded-md p-1 px-3 text-sm font-bold shadow-md opacity-80 hover:opacity-100 transition-opacity"
+                                                on:click={
+                                                    let key_clone = key.clone();
+                                                    move |_| {
+                                                        set_form_feed_id.set(key_clone.clone());
+                                                        match original_keys.get().get(key_clone.as_str()) {
+                                                            Some(original_data) => {
+                                                                set_form_password.set(
+                                                                    ron::ser::to_string_pretty(&original_data.passwords,
+                                                                        ron::ser::PrettyConfig::default()).unwrap(),
+                                                                );
+                                                                set_form_interval_ms.set(
+                                                                    ron::ser::to_string_pretty(&original_data.fetch_interval_ms,
+                                                                        ron::ser::PrettyConfig::default()).unwrap(),
+                                                                );
+                                                            },
+                                                            None => {
+                                                                set_form_password.set(String::from(""));
+                                                                set_form_interval_ms.set(String::from(""));
+                                                            }
+                                                        }
+                                                        set_is_modal_open.set(true);
+                                                    }
+                                                }
+                                            >
+                                                "Edit"
+                                            </button>
+                                        </div>
                                         {
                                             GTFSRAWOPTIONS.iter().map(|(name_of_feed_type, feed_type)|  view! {
                                                 <p class="font-semibold">{name_of_feed_type.to_string()} {" "}
-                                                <a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}", key.clone(), feed_type.clone())}>"Protobuf"</a>
+                                                <a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}", key, feed_type)}>"Protobuf"</a>
                                                 {" "}
-                                                <a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}&format=json", key.clone(), feed_type.clone())}>"Json"</a>
-                                                {" "}<a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}&format=ron", key.clone(), feed_type.clone())}>"Ron"</a>
+                                                <a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}&format=json", key, feed_type)}>"Json"</a>
+                                                {" "}<a class="underline text-blue-500 dark:text-blue-300" href={format!("https://birch.catenarymaps.org/gtfs_rt?feed_id={}&feed_type={}&format=ron", key, feed_type)}>"Ron"</a>
                                                 </p>
                                             }).collect_view()
                                         }
 
                                         <p class="font-semibold">"Passwords:"</p>
-                                        <pre class="my-4 p-4 rounded-md bg-gray dark:bg-darksky text-wrap overflow-scroll h-[300px]"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
+                                        <pre class="my-4 p-4 rounded-md bg-gray dark:bg-gray-900 text-wrap overflow-scroll h-[300px]"><code>{format!("{}", ron::ser::to_string_pretty(&value.passwords,
                                             ron::ser::PrettyConfig::default()).unwrap())}</code></pre>
                                         <p class="font-semibold">"Fetch Interval:"</p>
                                         <p>{format!("{:?}", value.fetch_interval_ms)}</p>
@@ -544,12 +595,35 @@ fn RealtimeKeys() -> impl IntoView {
 
                     </ul>
 
-                <div><h2 class="text-xl font-semibold">
-                "Submission form"
-                </h2></div>
+                <button
+                    class="bg-tulip text-white rounded-md p-3 px-6 mt-8 mb-4 text-lg font-bold shadow-lg opacity-90 hover:opacity-100 transition-opacity"
+                    on:click=move |_| {
+                        set_form_feed_id.set(String::from(""));
+                        set_form_interval_ms.set(String::from(""));
+                        set_form_password.set(String::from(""));
+                        set_is_modal_open.set(true);
+                    }
+                >
+                    "Add New Feed"
+                </button>
+
+                <Show when=move || is_modal_open.get()>
+                    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-70 backdrop-blur-sm overflow-y-auto w-screen h-screen">
+                        <div class="bg-white dark:bg-gray-900 variant text-black dark:text-gray p-8 rounded-lg shadow-2xl max-w-4xl w-full m-4 border-2 border-gray-500 max-h-[90vh] overflow-y-auto">
+                            <div class="flex flex-row justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold font-mono">
+                                    "Submission form"
+                                </h2>
+                                <button
+                                    class="text-gray-500 hover:text-tulip font-bold text-2xl"
+                                    on:click=move |_| set_is_modal_open.set(false)
+                                >
+                                    "×"
+                                </button>
+                            </div>
 
                 <div class="flex flex-row gap-x-2">
-                     <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                     <button class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold dark:text-gray"
 
                     on:click=move |_| {
                         set_form_feed_id.set(String::from(""));
@@ -559,7 +633,7 @@ fn RealtimeKeys() -> impl IntoView {
                     disabled=move || !authorised.get()
                      >"Clear all fields"</button>
 
-                        <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                        <button class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
                         on:click=move |_| {
                             set_form_password.set(format!("{}",
 
@@ -572,7 +646,7 @@ fn RealtimeKeys() -> impl IntoView {
                         "Fill with default password format"
                     </button>
 
-                    <button class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                    <button class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
                         on:click=move |_| {
                             match original_keys.get().get(form_feed_id.get().as_str()) {
                                 Some(original_data) => {
@@ -604,7 +678,7 @@ fn RealtimeKeys() -> impl IntoView {
                 type="text"
                 prop:value=move || form_feed_id.get()
                 disabled=move || !authorised.get()
-                class= "bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                class= "bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
                 on:input=move |event| {
                     set_form_feed_id.set(event_target_value(&event));
                 }
@@ -634,7 +708,7 @@ fn RealtimeKeys() -> impl IntoView {
             <input
                 type="text"
                 prop:value=move || form_interval_ms.get()
-                class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
                 on:input=move |event| {
                     set_form_interval_ms.set(event_target_value(&event));
@@ -660,7 +734,7 @@ fn RealtimeKeys() -> impl IntoView {
 
                 prop:value=move || form_password.get()
                 disabled=move || !authorised.get()
-                class= "w-full bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-base h-[400px]"
+                class= "w-full bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-base h-[400px]"
                 on:input=move |event| {
                     set_form_password.set(event_target_value(&event));
                 }
@@ -704,9 +778,9 @@ fn RealtimeKeys() -> impl IntoView {
 
             <button
 
-                class="bg-gray dark:bg-darksky rounded-md p-2 px-4 border-2 border-tulip my-4 text-lg font-bold"
+                class="bg-gray dark:bg-gray-900 rounded-md p-2 px-4 border-2 border-gray-500 my-4 text-lg font-bold"
                 disabled=move || !authorised.get()
-            on:click=move |e| {
+            on:click=move |_e| {
               let master_email = master_email.get();
                 let master_password = master_password.get();
               let (form_feed_id, form_password, form_interval_ms) = (form_feed_id.get(),
@@ -714,7 +788,7 @@ fn RealtimeKeys() -> impl IntoView {
               form_interval_ms.get());
 
               spawn_local(async move {
-                submit_data(master_email, master_password, form_feed_id, form_password, form_interval_ms).await;
+                let _ = submit_data(master_email, master_password, form_feed_id, form_password, form_interval_ms).await;
                 set_count.set(count.get() + 1);
                 //async_data_load.refetch();
               });
@@ -722,6 +796,9 @@ fn RealtimeKeys() -> impl IntoView {
 
 
                 >"Submit"</button>
+                            </div>
+                        </div>
+                    </Show>
                         }.into_any()
                     } else {
                         view! {

@@ -2,6 +2,8 @@
 // Catenary Transit Initiatives
 // Attribution cannot be removed
 
+use leptos_meta::MetaTags;
+
 #[cfg(feature = "ssr")]
 async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
     let banned_bots = vec![
@@ -31,14 +33,13 @@ async fn robots(req: actix_web::HttpRequest) -> impl actix_web::Responder {
         .body(robots_banned_bots)
 }
 
+#[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     use actix_files::Files;
     use actix_web::*;
     use leptos::prelude::get_configuration;
-    use leptos::*;
     use leptos_actix::{LeptosRoutes, generate_route_list};
-    use leptos_meta::MetaTags;
     use tulip::app::*;
     // Setting this to None means we'll be using cargo-leptos and its env vars.
     let conf = get_configuration(None).unwrap();
@@ -60,7 +61,6 @@ async fn main() -> std::io::Result<()> {
             {let leptos_options = leptos_options.clone();
                  move || {
                 use leptos::prelude::*;
-                use leptos_meta::*;
 
                 view! {
                     <!DOCTYPE html>
@@ -72,7 +72,8 @@ async fn main() -> std::io::Result<()> {
                             <HydrationScripts options=leptos_options.clone()/>
                             <MetaTags/>
                         </head>
-                        <body><App />
+                        <body class="bg-white text-black dark:bg-gray-950 dark:text-gray">
+                            <App />
                         </body>
                         </html>
                 }
@@ -87,3 +88,6 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+
+#[cfg(not(feature = "ssr"))]
+pub fn main() {}
