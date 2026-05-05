@@ -22,9 +22,9 @@ unic-langid = "0.9.4"
 leptos_i18n = "0.5.5"
 futures = "0.3.30"
 qstring = "0.7.2"
-reqwest = "0.13.1"
+reqwest = { version = "0.13.1", features = ["json"] }
 fasthash = "0.4.0"
-chrono = "0.4.37"
+chrono = { version = "0.4.37", features = ["serde"] }
 chrono-tz = "0.10.0"
 wasm-bindgen-futures = "0.4.43"
 serde = "1.0.197"

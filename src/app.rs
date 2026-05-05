@@ -1,3 +1,4 @@
+use crate::nav::Nav;
 // Copyright Kyler Chin <kyler@catenarymaps.org>
 // Additional Contributors: Samuel Sharp <samuel@catenarymaps.org>
 // Catenary Transit Initiatives
@@ -58,6 +59,8 @@ pub fn App() -> impl IntoView {
             }>
                 <Route path=path!("/") view=move || view! { <Home /> }/>
                 <Route path=path!("/realtimekeys") view=move || view! { <RealtimeKeys /> }/>
+                <Route path=path!("/chateaux") view=move || view! { <crate::chateaux::Chateaux /> }/>
+                <Route path=path!("/debug/schedule/:feed_id") view=move || view! { <crate::feed_metadata::FeedMetadata /> }/>
                 <Route path=path!("/test1") view=move || view! { <Test /> }/>
                 <Route path=path!("/help") view=move || view! { <Help /> }/>
                 <Route path=path!("/404.html") view=move || view! { <NotFound /> }/>
@@ -97,48 +100,7 @@ fn Test() -> impl IntoView {
     }
 }
 
-#[component]
-fn Nav() -> impl IntoView {
-    view! {
-        <div class="sticky top-0 left-0 w-full bg-gray dark:bg-gray-900 p-4 border-b-2 border-gray-500 text-tulip flex flex-row justify-between">
-            <a href="/">
-                <img alt="Tulip" src="/Tulip.svg" class="h-12"/>
-            </a>
-            <div class="space-x-4 flex self-center">
-                <a href="/realtimekeys" class="material-symbols-outlined">
-                    "key"
-                </a>
-                <a href="/help" class="material-symbols-outlined">
-                    "help"
-                </a>
-                <a href="#" class="material-symbols-outlined" on:click=move |e| {
-                    e.prevent_default();
-                    if let Some(window) = web_sys::window() {
-                        if let Some(document) = window.document() {
-                            if let Some(html) = document.query_selector("html").unwrap_or(None) {
-                                let class_list = html.class_list();
-                                let is_dark = class_list.contains("dark");
-                                if is_dark {
-                                    class_list.remove_1("dark").unwrap_or(());
-                                    if let Some(storage) = window.local_storage().unwrap_or(None) {
-                                        let _ = storage.set_item("theme", "light");
-                                    }
-                                } else {
-                                    class_list.add_1("dark").unwrap_or(());
-                                    if let Some(storage) = window.local_storage().unwrap_or(None) {
-                                        let _ = storage.set_item("theme", "dark");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }>
-                    "brightness_6"
-                </a>
-            </div>
-        </div>
-    }
-}
+
 
 #[component]
 fn Home() -> impl IntoView {

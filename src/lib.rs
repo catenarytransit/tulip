@@ -1,4 +1,7 @@
 pub mod app;
+pub mod chateaux;
+pub mod feed_metadata;
+pub mod nav;
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
