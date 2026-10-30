@@ -372,6 +372,20 @@ fn RealtimeKeys() -> impl IntoView {
     let (form_interval_ms, set_form_interval_ms) = signal(String::from(""));
     let (is_modal_open, set_is_modal_open) = signal(false);
 
+    // Escape dismisses the submission modal, including when focus is outside it.
+    #[cfg(feature = "hydrate")]
+    {
+        let handle = leptos::leptos_dom::helpers::window_event_listener(
+            leptos::ev::keydown,
+            move |event| {
+                if event.key() == "Escape" && is_modal_open.get_untracked() {
+                    set_is_modal_open.set(false);
+                }
+            },
+        );
+        on_cleanup(move || handle.remove());
+    }
+
     let original_keys: RwSignal<BTreeMap<String, EachPasswordRow>> = RwSignal::new(BTreeMap::new());
 
     let (authorised, set_authorised) = signal(false);
