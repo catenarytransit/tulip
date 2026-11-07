@@ -132,7 +132,7 @@ pub fn GtfsRtStats() -> impl IntoView {
     view! {
         <Nav/>
         <main class="m-4 md:m-8 text-black dark:text-gray-100">
-            <a href="/chateaux" class="underline text-blue-500 dark:text-blue-300">"Châteaux"</a>
+            <a href="/chateaux" class="underline text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">"Châteaux"</a>
             // Key by feed ID so changing the query disposes the old polling loop and data.
             <For each=move || vec![feed_id()] key=|id| id.clone() children=|id| view! {
                 <RealtimeFeedStats feed_id=id/>
@@ -221,26 +221,26 @@ fn RealtimeFeedStats(feed_id: String) -> impl IntoView {
     }
 
     view! {
-        <h1 class="text-2xl font-bold text-tulip mt-4 mb-2">"GTFS-RT stats"</h1>
-        <p class="font-mono break-all mb-4">{feed_id}</p>
+        <h1 class="text-2xl font-bold text-tulip dark:text-tulip-300 mt-4 mb-2">"GTFS-RT stats"</h1>
+        <p class="font-mono break-all mb-4 text-gray-800 dark:text-gray-200">{feed_id}</p>
         {if !valid_id { Some(view! {
-            <p role="alert">"Provide a feed ID using /gtfs-rt-stats?feed_id=…"</p>
+            <p role="alert" class="text-gray-700 dark:text-gray-300">"Provide a feed ID using /gtfs-rt-stats?feed_id=…"</p>
         }) } else { None }}
         <Show when=move || valid_id>
-            <p class="mb-2">"Refreshes every second. Timestamps are publisher times in Unix seconds."</p>
-            <p class="text-sm mb-4">{move || last_poll.get().map(|ts| format!("Last response: {}", timestamp_text(Some(ts as u64)))).unwrap_or_else(|| "Loading stats…".to_owned())}</p>
+            <p class="mb-2 text-gray-700 dark:text-gray-300">"Refreshes every second. Timestamps are publisher times in Unix seconds."</p>
+            <p class="text-sm mb-4 text-gray-600 dark:text-gray-400">{move || last_poll.get().map(|ts| format!("Last response: {}", timestamp_text(Some(ts as u64)))).unwrap_or_else(|| "Loading stats…".to_owned())}</p>
             {move || poll_error.get().map(|error| view! {
                 <p role="alert" class="text-red-600 dark:text-red-400 mb-4">{format!("Refresh failed: {error}. Any displayed data is from the last response; retrying automatically.")}</p>
             })}
             {move || stats.get().map(|snapshot| view! {
                 <section class="mb-6">
-                    <h2 class="text-xl font-semibold mb-2">"Feed update timestamps"</h2>
+                    <h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">"Feed update timestamps"</h2>
                     {match snapshot.timestamps {
-                        Err(error) => view! { <p role="alert">{format!("Timestamps unavailable: {error}")}</p> }.into_any(),
+                        Err(error) => view! { <p role="alert" class="text-red-600 dark:text-red-400">{format!("Timestamps unavailable: {error}")}</p> }.into_any(),
                         Ok(ts) => view! {
                             <div class="overflow-x-auto">
                                 <table class="table-auto w-full border-collapse">
-                                    <thead><tr class="text-left border-b border-gray-500">
+                                    <thead><tr class="text-left border-b border-gray-400 dark:border-gray-600 text-gray-800 dark:text-gray-200">
                                         <th class="p-2">"Category"</th><th class="p-2">"Last updated (UTC / Unix seconds)"</th><th class="p-2">"Age"</th>
                                     </tr></thead>
                                     <tbody>{[
@@ -248,8 +248,8 @@ fn RealtimeFeedStats(feed_id: String) -> impl IntoView {
                                         ("Trip updates", ts.trip_updates),
                                         ("Alerts", ts.alerts),
                                     ].into_iter().map(|(label, timestamp)| view! {
-                                        <tr class="border-b border-gray-300 dark:border-gray-700">
-                                            <th scope="row" class="p-2 text-left">{label}</th>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100">
+                                            <th scope="row" class="p-2 text-left font-normal">{label}</th>
                                             <td class="p-2 font-mono">{timestamp_text(timestamp)}</td>
                                             <td class="p-2 whitespace-nowrap">{move || age_text(timestamp, now.get())}</td>
                                         </tr>
@@ -260,19 +260,19 @@ fn RealtimeFeedStats(feed_id: String) -> impl IntoView {
                     }}
                 </section>
                 <section>
-                    <h2 class="text-xl font-semibold mb-2">"Chateau entity counts and metadata"</h2>
-                    <p class="mb-4">"Counts cover all realtime feeds in each chateau, including any other feeds listed below."</p>
+                    <h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">"Chateau entity counts and metadata"</h2>
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">"Counts cover all realtime feeds in each chateau, including any other feeds listed below."</p>
                     {match snapshot.chateaux {
-                        Err(error) => view! { <p role="alert">{format!("Chateau metadata unavailable: {error}")}</p> }.into_any(),
+                        Err(error) => view! { <p role="alert" class="text-red-600 dark:text-red-400">{format!("Chateau metadata unavailable: {error}")}</p> }.into_any(),
                         Ok(chateaux) if chateaux.is_empty() => view! {
-                            <p>"No matching chateau was found for this realtime feed."</p>
+                            <p class="text-gray-700 dark:text-gray-300">"No matching chateau was found for this realtime feed."</p>
                         }.into_any(),
                         Ok(chateaux) => chateaux.into_iter().map(|c| view! {
-                            <section class="border border-gray-400 rounded-lg p-4 mb-4">
-                                <h3 class="text-lg font-bold mb-2">{c.chateau.chateau.clone()}</h3>
-                                <p class="break-all">"Realtime feeds: "{c.chateau.realtime_feeds.join(", ")}</p>
-                                <p class="break-all">"Schedule feeds: "{c.chateau.schedule_feeds.join(", ")}</p>
-                                <p>"Languages: "{c.chateau.languages_avaliable.join(", ")}</p>
+                            <section class="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-lg p-4 mb-4 shadow-sm">
+                                <h3 class="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">{c.chateau.chateau.clone()}</h3>
+                                <p class="break-all text-gray-700 dark:text-gray-300">"Realtime feeds: "{c.chateau.realtime_feeds.join(", ")}</p>
+                                <p class="break-all text-gray-700 dark:text-gray-300">"Schedule feeds: "{c.chateau.schedule_feeds.join(", ")}</p>
+                                <p class="text-gray-700 dark:text-gray-300">"Languages: "{c.chateau.languages_avaliable.join(", ")}</p>
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
                                     <CountTable title="GTFS-RT entities" counts=c.entities/>
                                     <CountTable title="Aspen authoritative store" counts=c.authoritative/>
@@ -290,17 +290,17 @@ fn RealtimeFeedStats(feed_id: String) -> impl IntoView {
 fn CountTable(title: &'static str, counts: Result<BTreeMap<String, u64>, String>) -> impl IntoView {
     view! {
         <section>
-            <h4 class="font-semibold mb-2">{title}</h4>
+            <h4 class="font-semibold mb-2 text-gray-900 dark:text-gray-100">{title}</h4>
             {match counts {
-                Err(error) => view! { <p role="alert">{format!("Unavailable: {error}")}</p> }.into_any(),
-                Ok(counts) if counts.is_empty() => view! { <p>"No counters returned."</p> }.into_any(),
+                Err(error) => view! { <p role="alert" class="text-red-600 dark:text-red-400">{format!("Unavailable: {error}")}</p> }.into_any(),
+                Ok(counts) if counts.is_empty() => view! { <p class="text-gray-600 dark:text-gray-400">"No counters returned."</p> }.into_any(),
                 Ok(counts) => view! {
                     <div class="overflow-x-auto">
                         <table class="table-auto w-full border-collapse text-sm">
-                            <thead><tr class="border-b border-gray-500 text-left"><th class="p-2">"Metric"</th><th class="p-2 text-right">"Count"</th></tr></thead>
+                            <thead><tr class="border-b border-gray-400 dark:border-gray-600 text-left text-gray-800 dark:text-gray-200"><th class="p-2">"Metric"</th><th class="p-2 text-right">"Count"</th></tr></thead>
                             <tbody>{counts.into_iter().map(|(key, count)| view! {
-                                <tr class="border-b border-gray-300 dark:border-gray-700">
-                                    <th scope="row" class="p-2 text-left font-mono break-all">{key}</th>
+                                <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100">
+                                    <th scope="row" class="p-2 text-left font-mono break-all font-normal">{key}</th>
                                     <td class="p-2 text-right font-mono">{count}</td>
                                 </tr>
                             }).collect_view()}</tbody>
