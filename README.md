@@ -62,3 +62,26 @@ This may be useful for integrating external tools which require a static site, e
 ## Common Error Debugging
 
 If compilation complains about bad wasm bindgen version, run `cargo install cargo-leptos --force`
+
+### GTFS-RT feed stats
+
+Realtime feed cards in the key manager and Châteaux directory include a **View
+stats** link to `/gtfs-rt-stats?feed_id=<encoded-feed-id>`. The page polls once per
+second while open, showing publisher timestamps in UTC and Unix seconds, live
+ages in seconds, null timestamps, and endpoint errors. Slow requests do not
+overlap, and navigating away stops polling.
+
+Tulip's server queries Birch's `/gtfs_rt_timestamps?feed_id=...` endpoint (requires
+[catenary-backend PR #179](https://github.com/catenarytransit/catenary-backend/pull/179))
+and resolves the feed's chateaux using `/getchateausnogeom`. It displays
+`/chateau_gtfs_rt_counts/{chateau}` and
+`/chateau_authoritative_counts/{chateau}` alongside the associated feeds and
+languages. Both count endpoints are **chateau-wide totals**, which the UI labels
+explicitly. Directory membership is refreshed every minute; missing mappings are
+retried on each poll. No full GTFS-RT feeds or credentials are downloaded to show
+stats.
+
+Validation: `cargo test --lib --features ssr realtime_stats` and
+`cargo check --lib --target wasm32-unknown-unknown --features hydrate`.
+With a running Tulip build, run `npx playwright test tests/realtime-stats.spec.ts`
+in `end2end` (set `TULIP_TEST_URL` if not using `http://127.0.0.1:7914`).

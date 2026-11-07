@@ -57,7 +57,15 @@ pub fn Chateaux() -> impl IntoView {
                                     <div class="mt-2">
                                         <h3 class="font-bold">"Realtime Feeds:"</h3>
                                         <ul class="list-disc pl-5">
-                                            {c.realtime_feeds.into_iter().map(|f| view! { <li>{f}</li> }).collect_view()}
+                                            {c.realtime_feeds.into_iter().map(|f| {
+                                                let link = crate::realtime_stats::stats_url(&f);
+                                                view! {
+                                                    <li class="mb-2">
+                                                        <span class="break-all">{f}</span>
+                                                        <a href=link class="inline-block ml-2 bg-tulip text-white dark:text-darkskyvariant rounded-md p-1 px-3 text-sm font-bold">"View stats"</a>
+                                                    </li>
+                                                }
+                                            }).collect_view()}
                                         </ul>
                                     </div>
                                 </div>

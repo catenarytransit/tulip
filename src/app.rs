@@ -61,6 +61,7 @@ pub fn App() -> impl IntoView {
                 <Route path=path!("/realtimekeys") view=move || view! { <RealtimeKeys /> }/>
                 <Route path=path!("/chateaux") view=move || view! { <crate::chateaux::Chateaux /> }/>
                 <Route path=path!("/debug/schedule/:feed_id") view=move || view! { <crate::feed_metadata::FeedMetadata /> }/>
+                <Route path=path!("/gtfs-rt-stats") view=move || view! { <crate::realtime_stats::GtfsRtStats /> }/>
                 <Route path=path!("/test1") view=move || view! { <Test /> }/>
                 <Route path=path!("/help") view=move || view! { <Help /> }/>
                 <Route path=path!("/404.html") view=move || view! { <NotFound /> }/>
@@ -548,6 +549,7 @@ fn RealtimeKeys() -> impl IntoView {
                                                 "Edit"
                                             </button>
                                         </div>
+                                        <a href=crate::realtime_stats::stats_url(key) class="inline-block bg-tulip text-white dark:text-darkskyvariant rounded-md p-1 px-3 text-sm font-bold mb-2">"View stats"</a>
                                         {
                                             GTFSRAWOPTIONS.iter().map(|(name_of_feed_type, feed_type)|  view! {
                                                 <p class="font-semibold">{name_of_feed_type.to_string()} {" "}
