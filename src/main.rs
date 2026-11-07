@@ -81,7 +81,20 @@ async fn main() -> std::io::Result<()> {
             })
             .route("robots.txt", web::get().to(robots))
             .route("/api/{tail:.*}", leptos_actix::handle_server_fns())
-            .service(Files::new("/", site_root.to_string()))
+            .service(
+                actix_files::Files::new("/", site_root.to_string())
+                    .use_etag(false)
+                    .use_last_modified(false)
+                    .default_handler(actix_web::web::to(|| actix_web::HttpResponse::NotFound()))
+                    .disable_content_disposition()
+                    .use_hidden_files()
+                    .path_filter(|path, _| !path.to_str().unwrap().contains(".."))
+                    .redirect_to_slash_directory()
+                    // Here is the key part to disable caching:
+                    .append_header(("Cache-Control", "no-cache, no-store, must-revalidate"))
+                    .append_header(("Pragma", "no-cache"))
+                    .append_header(("Expires", "0")),
+            )
             .wrap(middleware::Compress::default())
     })
     .bind(&addr)?
