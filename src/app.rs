@@ -433,12 +433,13 @@ fn RealtimeKeys() -> impl IntoView {
     });
 
     Effect::new(move |_| {
-        if let Some(Some(Some(data))) = async_data_load.try_read() {
-            // Prevent unnecessary state writes if values haven't changed
-            if !authorised.get_untracked() {
-                set_authorised.set(true);
+        if let Some(guard) = async_data_load.try_read() {
+            if let Some(Some(data)) = guard.as_deref() {
+                if !authorised.get_untracked() {
+                    set_authorised.set(true);
+                }
+                original_keys.set(data.passwords.clone());
             }
-            original_keys.set(data.passwords.clone());
         }
     });
 
