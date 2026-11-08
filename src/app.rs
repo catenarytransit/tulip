@@ -432,23 +432,13 @@ fn RealtimeKeys() -> impl IntoView {
         async_part_left.refetch();
     });
 
-    let async_part_right = (&async_data_load).clone();
-
-    Effect::new(move || {
-        let data = async_part_right.try_read();
-
-        if let Some(data) = data {
-            log!("GOT THE GUARD");
-            if let Some(data) = &*data {
-                let data = data;
-
-                if let Some(data) = data {
-                    original_keys.update(|x| *x = data.passwords.clone());
-                    set_authorised.set(true);
-                }
+    Effect::new(move |_| {
+        if let Some(Some(Some(data))) = async_data_load.try_read() {
+            // Prevent unnecessary state writes if values haven't changed
+            if !authorised.get_untracked() {
+                set_authorised.set(true);
             }
-        } else {
-            println!("Could not access guard");
+            original_keys.set(data.passwords.clone());
         }
     });
 
