@@ -431,10 +431,10 @@ fn RealtimeKeys() -> impl IntoView {
         let _count = count.get();
         async_part_left.refetch();
     });
-
+    
     Effect::new(move |_| {
         if let Some(guard) = async_data_load.try_read() {
-            if let Some(Some(data)) = guard.as_deref() {
+            if let Some(Some(data)) = guard.as_ref() {
                 if !authorised.get_untracked() {
                     set_authorised.set(true);
                 }
