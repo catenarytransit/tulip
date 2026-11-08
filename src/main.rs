@@ -82,18 +82,23 @@ async fn main() -> std::io::Result<()> {
             .route("robots.txt", web::get().to(robots))
             .route("/api/{tail:.*}", leptos_actix::handle_server_fns())
             .service(
-                actix_files::Files::new("/", site_root.to_string())
-                    .use_etag(false)
-                    .use_last_modified(false)
-                    .default_handler(actix_web::web::to(|| actix_web::HttpResponse::NotFound()))
-                    .disable_content_disposition()
-                    .use_hidden_files()
-                    .path_filter(|path, _| !path.to_str().unwrap().contains(".."))
-                    .redirect_to_slash_directory()
-                    // Here is the key part to disable caching:
-                    .append_header(("Cache-Control", "no-cache, no-store, must-revalidate"))
-                    .append_header(("Pragma", "no-cache"))
-                    .append_header(("Expires", "0")),
+                web::scope("")
+                    .wrap(
+                        middleware::DefaultHeaders::new()
+                            .add(("Cache-Control", "no-cache, no-store, must-revalidate"))
+                            .add(("Pragma", "no-cache"))
+                            .add(("Expires", "0")),
+                    )
+                    .service(
+                        actix_files::Files::new("/", site_root.to_string())
+                            .use_etag(false)
+                            .use_last_modified(false)
+                            .default_handler(actix_web::web::to(|| actix_web::HttpResponse::NotFound()))
+                            .disable_content_disposition()
+                            .use_hidden_files()
+                            .path_filter(|path, _| !path.to_str().unwrap().contains(".."))
+                            .redirect_to_slash_directory(),
+                    ),
             )
             .wrap(middleware::Compress::default())
     })
